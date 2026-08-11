@@ -1,0 +1,168 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{11504815-1F39-4C1E-ACDF-70BFEFAB2D17}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>BCASClassLibrary</RootNamespace>
+    <AssemblyName>BCASClassLibrary</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.ReportViewer.Common, Version=12.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.ReportViewer.Common.v12.12.0.0.1\lib\Microsoft.ReportViewer.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.ReportViewer.DataVisualization, Version=12.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.ReportViewer.Runtime.Common.12.0.2402.15\lib\Microsoft.ReportViewer.DataVisualization.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.ReportViewer.Design, Version=15.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.ReportingServices.ReportViewerControl.WebForms.150.1400.0\lib\net40\Microsoft.ReportViewer.Design.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.ReportViewer.ProcessingObjectModel, Version=12.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.ReportViewer.Runtime.Common.12.0.2402.15\lib\Microsoft.ReportViewer.ProcessingObjectModel.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.ReportViewer.WebDesign, Version=15.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.ReportingServices.ReportViewerControl.WebForms.150.1400.0\lib\net40\Microsoft.ReportViewer.WebDesign.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.ReportViewer.WebForms, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.ReportViewer.WebForms.10.0.40219.1\lib\Microsoft.ReportViewer.WebForms.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.SqlServer.Types, Version=14.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.SqlServer.Types.14.0.314.76\lib\net40\Microsoft.SqlServer.Types.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.EnterpriseServices" />
+    <Reference Include="System.Transactions">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AppliedPostMasterAttrib.cs" />
+    <Compile Include="BCAS_SqlConnention.cs" />
+    <Compile Include="CalculateCheckSum.cs" />
+    <Compile Include="SqlServerTypes\Loader.cs" />
+    <Compile Include="TYP_EXAM_SCHEDULE.cs" />
+    <Compile Include="TYP_NominationEntryBySOScreenersAttrib.cs" />
+    <Compile Include="TYP_NominationEntryBySOScreeners.cs" />
+    <Compile Include="TYP_ScreenersApplicantDetailsAttrib.cs" />
+    <Compile Include="TYP_ScreenersApplicantDetails.cs" />
+    <Compile Include="DatabaseBkpAttrib.cs" />
+    <Compile Include="Data_Encryption_Utility.cs" />
+    <Compile Include="DateUtility.cs" />
+    <Compile Include="ImageVerifier.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SHASample.cs" />
+    <Compile Include="SqlHelper.cs" />
+    <Compile Include="TYP_ApplicantDetails.cs" />
+    <Compile Include="TYP_ApplicantDetailsAttrib.cs" />
+    <Compile Include="TYP_BCAS_Approval.cs" />
+    <Compile Include="TYP_BCAS_ApprovalAttrib.cs" />
+    <Compile Include="TYP_CANDIDATE_REGISTRATION.cs" />
+    <Compile Include="TYP_COUNTRY_MASTER.cs" />
+    <Compile Include="TYP_CourseMaster.cs" />
+    <Compile Include="TYP_CourseMasterAttrib.cs" />
+    <Compile Include="TYP_COURSE_MASTER.cs" />
+    <Compile Include="TYP_COURSE_SCHEDULE.cs" />
+    <Compile Include="TYP_COURSE_SCHEDULE_EXAM_LOCATION.cs" />
+    <Compile Include="TYP_CREATE_USER.cs" />
+    <Compile Include="TYP_CREATE_USERAttrib.cs" />
+    <Compile Include="TYP_DB_Backup.cs" />
+    <Compile Include="TYP_DESIGNATION_MASTER.cs" />
+    <Compile Include="TYP_EXAMLOCATIONMASTER.cs" />
+    <Compile Include="TYP_FeePaymentsBySO.cs" />
+    <Compile Include="TYP_FeePaymentsBySOAttrib.cs" />
+    <Compile Include="TYP_MENUMASTER.cs" />
+    <Compile Include="TYP_NEFT_RTGS_File_Upload.cs" />
+    <Compile Include="TYP_NEFT_RTGS_File_UploadAttrib.cs" />
+    <Compile Include="TYP_NEFT_RTGS_PayeePayments.cs" />
+    <Compile Include="TYP_NEFT_RTGS_PayeePaymentsAttrib.cs" />
+    <Compile Include="TYP_NominationEntryBySO.cs" />
+    <Compile Include="TYP_NominationEntryBySOAttrib.cs" />
+    <Compile Include="TYP_PayeeOrganisationPayment.cs" />
+    <Compile Include="TYP_PayeeOrganisationPaymentAttrib.cs" />
+    <Compile Include="TYP_PAYEE_ORGANISATION_MASTER.cs" />
+    <Compile Include="TYP_PAYEE_SPONSORED_ORGANISATION.cs" />
+    <Compile Include="TYP_PaymentResponse.cs" />
+    <Compile Include="TYP_PaymentResponseAttrib.cs" />
+    <Compile Include="TYP_PREVIOUS_COURSES_ATTENDED.cs" />
+    <Compile Include="TYP_QUALIFICATION_MASTER.cs" />
+    <Compile Include="TYP_rptSuccessfulTransaction.cs" />
+    <Compile Include="TYP_SPONSORING_ORGANISATION_MASTER.cs" />
+    <Compile Include="TYP_USERROLEFORM.cs" />
+    <Compile Include="TYP_USER_Details.cs" />
+    <Compile Include="TYP_WORKING_EXPERIENCE.cs" />
+    <Compile Include="UTL_CSV_FILES.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="SqlServerTypes\readme.htm" />
+    <Content Include="SqlServerTypes\x64\msvcr120.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlServerTypes\x64\SqlServerSpatial140.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlServerTypes\x86\msvcr120.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlServerTypes\x86\SqlServerSpatial140.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

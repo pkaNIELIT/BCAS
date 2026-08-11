@@ -1,0 +1,216 @@
+﻿using System;
+using System.Collections;
+using System.Configuration;
+using System.Data;
+using System.Linq;
+using System.Web;
+using System.Web.Security;
+using System.Web.UI;
+using System.Web.UI.HtmlControls;
+using System.Web.UI.WebControls;
+using System.Web.UI.WebControls.WebParts;
+using System.Xml.Linq;
+using BCASClassLibrary;
+using System.IO;
+
+public partial class Forms_MasterForms_frmDatabaseBackup : System.Web.UI.Page
+{
+
+    //protected override void OnPreRender(EventArgs e)
+    //{
+    //    // Diable Back Button **//
+    //    base.OnPreRender(e);
+    //    string strDisAbleBackButton;
+    //    strDisAbleBackButton = "<SCRIPT language=javascript>\n";
+    //    strDisAbleBackButton += "window.history.forward(1);\n";
+    //    strDisAbleBackButton += "\n</SCRIPT>";
+    //    Page.ClientScript.RegisterClientScriptBlock(this.Page.GetType(), "clientScript", strDisAbleBackButton);
+    //}
+
+
+    protected void Page_Init(object sender, EventArgs e)
+    {
+
+        Response.Cache.SetCacheability(HttpCacheability.NoCache);
+        Response.Cache.SetExpires(DateTime.Now.AddSeconds(-1));
+        Response.Cache.SetNoStore();
+
+    }
+
+    public void DisableForwordButton()
+    {
+        Response.Expires = 0;
+        Response.Cache.SetNoStore();
+        Response.AppendHeader("Pragma", "no-cache");
+    }
+
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        DisableForwordButton();
+        //txtFileName.Text = "";
+        lblMsg.Visible = false;
+
+        if (Convert.ToString(HttpContext.Current.Session["UserId"]).Trim().Length != 0)
+        {
+
+            //if (Session["New"].ToString() != Request.Cookies["Session"].Value.ToString())
+            //{
+
+            //    ClearCookiesSessions();
+            //    HttpContext.Current.Response.Redirect("~/Forms/DetailForms/ErrorPage.aspx", false);
+
+            //}
+            //else
+            //{
+            //    Random ds = new Random();
+            //    int cks = ds.Next();
+            //    Session["New"] = cks;
+            //    HttpCookie mycookie = new HttpCookie("Session");
+            //    mycookie.Path = "/";
+            //    mycookie.Value = Session["New"].ToString();
+            //    Response.Cookies.Add(mycookie);
+
+            //}
+
+        }
+        else
+        {
+            ClearCookiesSessions();
+            //HttpContext.Current.Response.Redirect("~/Forms/DetailForms/ErrorPage.aspx", false);
+            HttpContext.Current.Server.Transfer("~/Home.aspx", false);
+
+        }     
+
+        //*******       
+
+        Response.Cache.SetCacheability(HttpCacheability.NoCache);
+
+
+    }
+
+   
+    protected void btnSave_Click(object sender, EventArgs e)
+    {
+        if (Page.IsValid)
+        {
+            lblMsg.Visible = false;
+            DeleteAllPrevBackups();
+
+            TYP_DB_Backup objDBBKP = new TYP_DB_Backup();
+            
+            string path;
+            string filename;
+
+            filename = txtFileName.Text.Trim();
+            path = Server.MapPath("~\\DataBase_Backup\\" + filename);
+
+            objDBBKP.v_filePath = path;
+            
+            //objDBBKP.v_filePath = txtFileName.Text.Trim();
+            bool  status;
+            status = objDBBKP.Database_Backup();
+            if (!status)
+            {
+                lblMsg.Visible = true;
+                lblMsg.Text = "Database Backup Failed";
+                //MessageBox("Database Backup Failed");
+            }
+            else
+            {
+               
+                lblMsg.Visible = true;
+                lblMsg.Text = "Database Backup Successful. Please Download it !!!";
+                //MessageBox("Database Backup Successful");
+            }
+
+        }
+
+
+    }
+
+    
+
+    public void MessageBox(string msg)
+    {
+        string MSG = String.Format("alert('" + msg + "')");
+        ScriptManager.RegisterStartupScript(Page, Page.GetType(), "MSG", MSG, true);
+    }
+
+    protected void Button1_Click(object sender, EventArgs e)
+    {
+        //**********************
+        // Get the physical Path of the file(test.doc)
+        string filename;
+        filename = txtFileName.Text.Trim();
+        string filepath = Server.MapPath("~\\DataBase_Backup\\" + filename);
+
+        //string filepath = Server.MapPath("http://192.168.1.218\\F:\\Software Development\\BCAS_Application\\BCAS\\BCAS\\BCASApplication\\DataBase_Backup\\" + filename);
+
+
+        // Create New instance of FileInfo class to get the properties of the file being downloaded
+        FileInfo file = new FileInfo(filepath);
+
+        // Checking if file exists
+        if (file.Exists)
+        {
+            // Clear the content of the response
+            Response.ClearContent();
+
+            // LINE1: Add the file name and attachment, which will force the open/cance/save dialog to show, to the header
+            Response.AddHeader("Content-Disposition", "attachment; filename=" + file.Name);
+
+            // Add the file size into the response header
+            Response.AddHeader("Content-Length", file.Length.ToString());
+
+            // Set the ContentType
+            Response.ContentType = "application/bak";
+
+            // Write the file into the response (TransmitFile is for ASP.NET 2.0. In ASP.NET 1.1 you have to use WriteFile instead)
+            Response.TransmitFile(file.FullName);
+                       
+            // End the response
+            Response.End();            
+           
+        }
+        //if (file.Exists)
+        //{
+        //    File.Delete(Server.MapPath("~\\DataBase_Backup\\" + filename));
+        //}
+    }
+
+    public void DeleteAllPrevBackups()
+    {
+        foreach (var f in System.IO.Directory.GetFiles(Server.MapPath("~/DataBase_Backup")))
+            System.IO.File.Delete(f);
+    }
+
+    public void ClearCookiesSessions()
+    {
+        Session.Abandon();
+        Session.Clear();
+        Session.RemoveAll();
+
+        string[] myCookies = Request.Cookies.AllKeys;
+        foreach (string cookie in myCookies)
+        {
+            Response.Cookies[cookie].Expires = DateTime.Now.AddDays(-1);
+        }
+    }
+
+    protected void lnkLogout_Click(object sender, EventArgs e)
+    {
+        //////**** Logout Time Update *** 
+        //TYP_AUDIT_TRAIL objLogout = new TYP_AUDIT_TRAIL();
+        //objLogout.i_ID = Convert.ToInt32(HttpContext.Current.Session["ID"].ToString().Trim());
+        //using (DataTable dt_Pay = objLogout.UpdateLogOut())
+        //{
+        //    //if (Convert.ToInt32(dt_Pay.Rows[0][0]) != 0)
+        //    //{
+        //    //    //lblError.Text = "Insertion Failed";
+        //    //}
+        //}
+        //ClearCookiesSessions();
+        //Response.Redirect("~/frmMain.aspx", false);
+        //////*******Till Here 
+    }
+}

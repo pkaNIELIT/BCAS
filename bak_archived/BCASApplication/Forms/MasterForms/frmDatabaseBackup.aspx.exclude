@@ -1,0 +1,98 @@
+<%@ Page Language="C#" MasterPageFile="~/MasterPage.master" AutoEventWireup="true" CodeFile="frmDatabaseBackup.aspx.cs" Inherits="Forms_MasterForms_frmDatabaseBackup" Title="DatabaseBackup" Culture="en-GB" meta:resourcekey="PageResource1" uiculture="auto" %>
+
+
+<asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
+    <style type="text/css">
+        .style1
+        {
+            height: 23px;
+        }
+        .style2
+        {
+            height: 16px;
+        }
+        .style3
+        {
+            width: 131px;
+            height: 16px;
+        }
+    </style>
+    </asp:Content>
+<asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" Runat="Server">
+    <table width="100%" align="center">
+        <tr>
+            <td>
+                &nbsp;
+            </td>
+        </tr>
+        <tr>
+            <td>
+            </td>
+        </tr>
+        <tr align="center">
+            <td align="center">
+                <table align="center" cellspacing="0" height="250" width="60%" style="border-collapse: collapse"
+                    cellpadding="0">
+                    <tr>
+                        <td align="center" valign="top">
+                            <table align="center" border="0" style="width: 89%">
+                                <tr>
+                                    <td align="center" class="style1">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td align="center">
+                                        <asp:Label ID="lblTitle" runat="server" Font-Bold="False" Font-Names="Monotype Corsiva"
+                                            Font-Size="X-Large" ForeColor="#990033" meta:resourcekey="lblTitle"></asp:Label>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td align="center">
+                                        &nbsp;
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <table width="80%" align="center" border="2">
+                                            <tr align="left">
+                                                <td width="25%">
+                                                    <asp:Label ID="Label1" runat="server" meta:resourcekey="Label1Resource1" Text="lblFileName"></asp:Label>
+                                                </td>
+                                                <td width="75%">
+                                                    <asp:TextBox ID="txtFileName" runat="server" Width="255px"></asp:TextBox>
+                                                    <asp:RequiredFieldValidator ID="RequiredFieldValidator1" runat="server" ControlToValidate="txtFileName"
+                                                        ErrorMessage="*" meta:resourcekey="RequiredFieldValidator1Resource1"></asp:RequiredFieldValidator>
+                                                </td>
+                                            </tr>
+                                            <tr align="left">
+                                                <td width="25%">
+                                                </td>
+                                                <td width="75%">
+                                                    <asp:Button ID="btnSave" runat="server" meta:resourcekey="btnSaveResource1" OnClick="btnSave_Click"
+                                                        Width="120px" />
+                                                    <asp:Button ID="btnDownload" runat="server" meta:resourcekey="btnDownload" OnClick="Button1_Click"
+                                                        Width="135px" />
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td align="center" style="text-align: left">
+                                        &nbsp;
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="text-align: left">
+                                        <asp:Label ID="lblMsg" runat="server" Font-Size="Larger" ForeColor="#000066" Visible="False"></asp:Label>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</asp:Content>
+

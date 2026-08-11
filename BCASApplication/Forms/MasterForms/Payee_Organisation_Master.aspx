@@ -1,0 +1,217 @@
+<%@ Page Language="C#" EnableEventValidation="false" MasterPageFile="~/MasterPage.master"
+    AutoEventWireup="true" Culture="en-GB" UICulture="auto"
+    CodeFile="Payee_Organisation_Master.aspx.cs" Inherits="Payee_Organisation_Master" Title="Payee_Organisation_Master" %>
+
+<%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="cc1" %>
+<asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolder1" runat="Server">
+    <table width="90%" align="center">
+        <tr>
+            <td>&nbsp;
+            </td>
+        </tr>
+        <tr>
+            <td></td>
+        </tr>
+        <tr align="center">
+            <td align="center">
+                <table style="width: auto; height: 96px; border: 1" align="center">
+                    <tr>
+                        <td colspan="2" style="height: 21px" align="center">
+                            <asp:Label ID="lbl_Heading" runat="server" meta:resourcekey="lbl_Heading" EnableTheming="True"></asp:Label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="height: 35%" align="center">
+                            <asp:UpdatePanel ID="UpdatePanel1" runat="server">
+                                <ContentTemplate>
+                                    <table style="height: 34%">
+                                        <tr>
+                                            <td style="height: 70%">
+                                                <asp:Panel ID="frm_panel" runat="server" Enabled="false">
+                                                    <table style="height: 70%; width: auto;">
+                                                        <tr>
+                                                            <td align="left">
+                                                                <asp:Label ID="lbl_payee_organisation_code" runat="server" meta:resourcekey="lbl_payee_organisation_code"></asp:Label>
+                                                            </td>
+                                                            <td style="width: 87px; height: 16px" align="left">
+                                                                <asp:TextBox ID="txt_payee_organisation_code" runat="server" Width="414px" MaxLength="10"
+                                                                    Enabled="False"></asp:TextBox>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td align="left">
+                                                                <asp:Label ID="lbl_payee_organisation_name" runat="server" meta:resourcekey="lbl_payee_organisation_name"></asp:Label>
+                                                            </td>
+                                                            <td style="width: 87px; height: 16px" align="left">
+                                                                <asp:TextBox ID="txt_payee_organisation_name" runat="server" Width="415px" MaxLength="100" TextMode="MultiLine"></asp:TextBox>
+                                                                <cc1:MaskedEditExtender ID="mee_payee_organisation_name" runat="server" TargetControlID="txt_payee_organisation_name"
+                                                                    Mask="LA{99}" Filtered="[0123456789+.,&-/  ]" PromptCharacter="">
+                                                                </cc1:MaskedEditExtender>
+                                                                <cc1:MaskedEditValidator ID="mev_payee_organisation_name" runat="server" ControlExtender="mee_payee_organisation_name"
+                                                                    ControlToValidate="txt_payee_organisation_name" EmptyValueMessage="Payee Organisation Name must be entered"
+                                                                    IsValidEmpty="false" Display="None"></cc1:MaskedEditValidator>
+                                                                <cc1:ValidatorCalloutExtender ID="vce_payee_organisation_name" runat="server" TargetControlID="mev_payee_organisation_name">
+                                                                </cc1:ValidatorCalloutExtender>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td align="left">
+                                                                Address</td>
+                                                            <td style="width: 87px; height: 16px" align="left">
+                                                                <asp:TextBox ID="txt_payee_address" runat="server" MaxLength="100" Width="420px" Height="85px" TextMode="MultiLine"></asp:TextBox>
+                                                                <%--<cc1:MaskedEditExtender ID="txt_payee_address_MaskedEditExtender" runat="server" Filtered="[0123456789+.,&amp;-/  ]" Mask="LA{99}" PromptCharacter="" TargetControlID="txt_payee_address">
+                                                                </cc1:MaskedEditExtender>--%>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td align="left">
+                                                                <asp:Label ID="lbl_payee_location_pincode" runat="server" meta:resourcekey="lbl_payee_location_pincode" Text=" Pincode"></asp:Label>
+                                                            </td>
+                                                            <td align="left" style="width: 87px; height: 16px">
+                                                                <asp:TextBox ID="txt_payee_location_pincode" runat="server" MaxLength="100" Width="336px"></asp:TextBox>
+                                                                <cc1:MaskedEditExtender ID="mee_payee_location_pincode" runat="server" Filtered="[0123456789]" Mask="999999" PromptCharacter="" TargetControlID="txt_payee_location_pincode">
+                                                                </cc1:MaskedEditExtender>
+                                                                <cc1:MaskedEditValidator ID="mev_payee_location_pincode" runat="server" ControlExtender="mee_payee_location_pincode" ControlToValidate="txt_payee_location_pincode" Display="None" EmptyValueMessage="Payee Organisation Pincode must be entered" IsValidEmpty="false"></cc1:MaskedEditValidator>
+                                                                <cc1:ValidatorCalloutExtender ID="vce_payee_location_pincode" runat="server" TargetControlID="mev_payee_location_pincode">
+                                                                </cc1:ValidatorCalloutExtender>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                SCODE</td>
+                                                            <td>
+                                                                <asp:TextBox ID="txt_scode" runat="server" MaxLength="100" Width="336px"></asp:TextBox>
+                                                                <cc1:MaskedEditExtender ID="txt_scode_MaskedEditExtender" runat="server" Filtered="[0123456789]" Mask="999999" PromptCharacter="" TargetControlID="txt_scode">
+                                                                </cc1:MaskedEditExtender>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <asp:Label ID="lblState" runat="server" Text="State"></asp:Label>
+                                                            </td>
+                                                            <td>
+                                                                <asp:DropDownList ID="drpState" runat="server" AppendDataBoundItems="True" Height="16px">
+                                                                    <asp:ListItem Selected="True" Value="0">Select</asp:ListItem>
+                                                                </asp:DropDownList>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <asp:Label ID="lblGSTIN" runat="server" Text="GSTIN"></asp:Label>
+                                                            </td>
+                                                            <td>
+                                                                <asp:TextBox ID="txtGSTIN" runat="server" Width="240px" MaxLength="15"></asp:TextBox>
+                                                            </td>
+                                                        </tr>
+
+
+                                                    </table>
+                                                </asp:Panel>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2" style="height: 20px;" align="center">
+                                                <table>
+                                                    <tr>
+                                                        <td style="height: 26px">
+                                                            <asp:Button ID="btn_insert" runat="server" EnableTheming="False" meta:resourcekey="btn_insert"
+                                                                OnClick="btn_insert_Click" CausesValidation="false" AccessKey="I" />
+                                                        </td>
+                                                        <td style="height: 26px">
+                                                            <asp:Button ID="btn_update" runat="server" EnableTheming="False" meta:resourcekey="btn_update"
+                                                                OnClick="btn_update_Click" CausesValidation="false" Enabled="false" AccessKey="U" />
+                                                         <%--   <asp:Label ID="Label_error1" runat="server" Text=""></asp:Label>--%>
+                                                        </td>
+                                                        <td style="height: 26px">
+                                                            <asp:Button ID="btn_search" runat="server" EnableTheming="False" meta:resourcekey="btn_search"
+                                                                CausesValidation="false" Enabled="false" OnClick="btn_search_Click" AccessKey="S" />
+                                                        </td>
+                                                        <td style="height: 26px">
+                                                            <asp:Button ID="btn_save" runat="server" EnableTheming="False" meta:resourcekey="btn_save"
+                                                                OnClick="btn_save_Click" CausesValidation="true" AccessKey="V" />
+                                                        </td>
+                                                        <td style="height: 26px">
+                                                            <asp:Button ID="btn_cancel" runat="server" EnableTheming="False" meta:resourcekey="btn_cancel"
+                                                                OnClick="btn_cancel_Click" CausesValidation="False" AccessKey="C" />
+                                                        </td>
+                                                        <td style="height: 26px">
+                                                            <asp:Button ID="btn_display" runat="server" EnableTheming="False" meta:resourcekey="btn_display"
+                                                                OnClick="btn_display_Click" CausesValidation="False" AccessKey="D" />
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <asp:Label ID="lbl_choice" runat="server" Visible="False"></asp:Label>
+                                                <asp:Label ID="lbl_error" runat="server"></asp:Label>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <table>
+                                                    <thead>
+                                                        <asp:Label ID="lbl_errors" runat="server" Font-Bold="true" meta:resourcekey="lbl_errors"
+                                                            Visible="false"></asp:Label>
+                                                    </thead>
+                                                    <tr>
+                                                        <td style="height: 28px; width: auto;">
+                                                            <asp:BulletedList ID="bullet_errors" runat="server" BulletStyle="Numbered">
+                                                            </asp:BulletedList>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </ContentTemplate>
+                            </asp:UpdatePanel>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <asp:UpdatePanel ID="UpdatePanel2" runat="server">
+                                <ContentTemplate>
+                                    <table style="width: auto; height: 96px">
+                                        <tr>
+                                            <td>
+                                                <asp:Panel ID="grd_panel" runat="server" BorderColor="#DEBA84" BorderWidth="1px">
+                                                    <asp:GridView ID="GridView1" runat="server" AllowPaging="True" BackColor="#DEBA84"
+                                                        BorderColor="#DEBA84" BorderStyle="None" BorderWidth="1px" CellPadding="3" CellSpacing="2"
+                                                        DataSourceID="ObjectDataSource1" PageSize="50" Height="50%" OnSelectedIndexChanged="GridView1_SelectedIndexChanged"
+                                                        OnRowDataBound="GridView1_RowDataBound">
+                                                        <FooterStyle BackColor="#F7DFB5" ForeColor="#8C4510" />
+                                                        <RowStyle BackColor="#FFF7E7" ForeColor="#8C4510" HorizontalAlign="Center" Wrap="True" />
+                                                        <SelectedRowStyle BackColor="#738A9C" Font-Bold="True" ForeColor="White" />
+                                                        <Columns>
+                                                            <asp:CommandField ShowSelectButton="True" />
+                                                        </Columns>
+                                                        <PagerStyle ForeColor="#8C4510" HorizontalAlign="Left" />
+                                                        <HeaderStyle BackColor="#A55129" Font-Bold="True" ForeColor="White" />
+                                                    </asp:GridView>
+                                                    <asp:ObjectDataSource ID="ObjectDataSource1" runat="server" SelectMethod="GetPayee_Organisation_Master"
+                                                        TypeName="BCASClassLibrary.TYP_PAYEE_ORGANISATION_MASTER">
+                                                        <SelectParameters>
+                                                            <asp:Parameter Name="pPayee_Organisation_Code" Type="Int32" DefaultValue="-1" />
+                                                            <asp:Parameter Name="pPayee_Organisation_Name" Type="String" DefaultValue="*" />
+                                                        </SelectParameters>
+                                                    </asp:ObjectDataSource>
+                                                </asp:Panel>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </ContentTemplate>
+                                <Triggers>
+                                    <%--<asp:AsyncPostBackTrigger ControlID="btn_save" EventName="Click" />
+                                    <asp:AsyncPostBackTrigger ControlID="btn_display" EventName="Click" />--%>
+                                </Triggers>
+                            </asp:UpdatePanel>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</asp:Content>
+

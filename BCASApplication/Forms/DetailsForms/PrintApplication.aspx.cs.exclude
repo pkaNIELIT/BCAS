@@ -1,0 +1,256 @@
+﻿using System;
+using System.Collections;
+using System.Configuration;
+using System.Data;
+using System.Linq;
+using System.Web;
+using System.Web.Security;
+using System.Web.UI;
+using System.Web.UI.HtmlControls;
+using System.Web.UI.WebControls;
+using System.Web.UI.WebControls.WebParts;
+using System.Xml.Linq;
+using System.Collections.Generic;
+using iTextSharp.text;
+using iTextSharp.text.pdf;
+using System.IO;
+using BCASClassLibrary;
+
+public partial class Forms_DetailsForms_PrintApplication : System.Web.UI.Page
+{
+    TYP_ApplicantDetails objApplicant = new TYP_ApplicantDetails();
+
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        //if ((Convert.ToString(HttpContext.Current.Session["UserId"]).Trim().Length == 0))
+        //{
+        //    HttpContext.Current.Response.Redirect("~/Home.aspx");
+        //}
+       
+
+        Session["UserOrg"] = 2;
+    }
+
+    protected void btnPrint_Click(object sender, EventArgs e)
+    {
+        if (Convert.ToInt32(txtRegNo.ToString().Length) != 0)
+        {
+
+            //**********
+            objApplicant.i_Registration_Number = Convert.ToInt32(txtRegNo.Text);
+
+            using (DataTable dt = objApplicant.getCandidateDetails_PrintApplication(Convert.ToInt32(txtRegNo.Text), Convert.ToInt32(Session["UserOrg"])))
+            {
+                if (dt.Rows.Count != 0)
+                {
+                   //*******For Printing of Application
+                    // Create a Document object
+                    var document = new Document(PageSize.A4, 50, 50, 25, 25);
+
+                    // Create a new PdfWrite object, writing the output to a MemoryStream
+                    var output = new MemoryStream();
+                    var writer = PdfWriter.GetInstance(document, output);
+
+                    // Open the Document for writing
+                    document.Open();
+
+                    // First, create our fonts... (For more on working w/fonts in iTextSharp, see: http://www.mikesdotnetting.com/Article/81/iTextSharp-Working-with-Fonts
+                    var titleFont = FontFactory.GetFont("Arial", 18, Font.BOLD);
+                    var subTitleFont = FontFactory.GetFont("Arial", 14, Font.BOLD);
+                    var boldTableFont = FontFactory.GetFont("Arial", 14, Font.UNDERLINE);
+                    var endingMessageFont = FontFactory.GetFont("Arial", 10, Font.ITALIC);
+                    var bodyFont = FontFactory.GetFont("Arial", 12, Font.NORMAL);
+                    var SmallText = FontFactory.GetFont("Arial", 8, Font.NORMAL);
+
+                    // Create the Order Information table - see http://www.mikesdotnetting.com/Article/86/iTextSharp-Introducing-Tables for more info
+
+                    var CandidateInfoTable = new PdfPTable(3);
+                    CandidateInfoTable.TotalWidth = 500f;
+                    CandidateInfoTable.LockedWidth = true;
+                    CandidateInfoTable.DefaultCell.BorderWidth = 1;
+
+                    var photo_Header = iTextSharp.text.Image.GetInstance(Server.MapPath("~/Images/bcas2.png"));
+                    photo_Header.ScaleAbsoluteHeight(30);
+                    photo_Header.ScaleAbsoluteWidth(500);
+
+                    PdfPCell cell = new PdfPCell(photo_Header);
+                    cell.Colspan = 3;
+                    //cell. = 75;
+                    cell.FixedHeight = 40;
+                    CandidateInfoTable.AddCell(cell);
+                    //cell = new PdfPCell(new Phrase("Candiadte Details", subTitleFont));
+                    //cell.Colspan = 3;
+                    //cell.HorizontalAlignment = 1; //0=Left, 1=Centre, 2=Right
+                    //CandidateInfoTable.AddCell(cell);
+                    //var photo = iTextSharp.text.Image.GetInstance(Server.MapPath("~//Upload//Photograph//" + dt.Rows[0]["Photo_Filename"].ToString()));
+                    //photo.ScaleAbsoluteHeight(70);
+                    //photo.ScaleAbsoluteWidth(60);
+
+                    //cell = new PdfPCell(photo);
+                    //cell.Rowspan = 5;
+                    //cell.PaddingTop = 5;
+                    //cell.PaddingBottom = 5;
+                    //cell.PaddingLeft = 5;
+                    //cell.PaddingRight = 5;
+                    //cell.HorizontalAlignment = 0; //0=Left, 1=Centre, 2=Right
+                    //CandidateInfoTable.AddCell(cell);
+                                                            
+                    ////****
+                    //CandidateInfoTable.HorizontalAlignment = 1;
+                    //CandidateInfoTable.SpacingBefore = 10;
+                    //CandidateInfoTable.SpacingAfter = 10;
+                    //CandidateInfoTable.DefaultCell.BorderWidth = 1;
+                    //CandidateInfoTable.SetWidths(new int[] { 5, 7, 8 });
+                    //CandidateInfoTable.AddCell(new Phrase("Regd. No:", bodyFont));
+                    //CandidateInfoTable.AddCell(Convert.ToInt64(dt.Rows[0]["Registration_Number"].ToString()).ToString());
+                    //CandidateInfoTable.AddCell(new Phrase("Name:", bodyFont));
+                    //CandidateInfoTable.AddCell(dt.Rows[0]["Candidate_Name"].ToString());
+                    //CandidateInfoTable.AddCell(new Phrase("Sex:", bodyFont));
+                    //CandidateInfoTable.AddCell(dt.Rows[0]["Sex_Code"].ToString());
+                    //CandidateInfoTable.AddCell(new Phrase("Designation:", bodyFont));
+                    //CandidateInfoTable.AddCell(dt.Rows[0]["Designation"].ToString());                    
+                    //CandidateInfoTable.AddCell(new Phrase("Qualification:", bodyFont));
+                    //CandidateInfoTable.AddCell(dt.Rows[0]["Qualification"].ToString());                   
+                    //document.Add(CandidateInfoTable);
+
+                    //###########
+                    //////*********New Changed Code
+                    var ExamDetailTable = new PdfPTable(2);
+                    ExamDetailTable.TotalWidth = 500f;
+                    ExamDetailTable.LockedWidth = true;
+                    ExamDetailTable.DefaultCell.BorderWidth = 1;
+
+                    cell = new PdfPCell(new Phrase("Candidate Details", boldTableFont));
+                    cell.Colspan = 2;
+                    cell.PaddingBottom = 5;
+                    cell.HorizontalAlignment = 1; //0=Left, 1=Centre, 2=Right
+                    ExamDetailTable.AddCell(cell);
+                    //******
+                 
+                    ExamDetailTable.HorizontalAlignment = 1;
+                    //CandidateInfoTable.SpacingBefore = 10;
+                    //CandidateInfoTable.SpacingAfter = 10;
+                    ExamDetailTable.DefaultCell.BorderWidth = 1;
+                    ExamDetailTable.SetWidths(new int[] { 5, 15 });
+
+
+                   
+
+                    var imgPhoto = iTextSharp.text.Image.GetInstance(Server.MapPath("~//Upload//Photograph//" + dt.Rows[0]["Photo_Filename"].ToString()));
+                    ExamDetailTable.AddCell(new Phrase("Candidate Photo:", bodyFont));
+                    imgPhoto.ScaleAbsoluteHeight(60);
+                    imgPhoto.ScaleAbsoluteWidth(70);
+
+                    cell = new PdfPCell(imgPhoto);
+                    ExamDetailTable.AddCell(cell);
+
+                    var sign = iTextSharp.text.Image.GetInstance(Server.MapPath("~//Upload//Signature//" + dt.Rows[0]["Signature_Filename"].ToString()));
+                    ExamDetailTable.AddCell(new Phrase("Sign:", bodyFont));
+                    sign.ScaleAbsoluteHeight(60);
+                    sign.ScaleAbsoluteWidth(70);
+                    cell = new PdfPCell(sign);
+                    ExamDetailTable.AddCell(cell);
+
+                    ExamDetailTable.AddCell(new Phrase("Regd. No:", boldTableFont));
+                    ExamDetailTable.AddCell(Convert.ToInt64(dt.Rows[0]["Registration_Number"].ToString()).ToString());
+
+                    ExamDetailTable.AddCell(new Phrase("Name:", boldTableFont));
+                    ExamDetailTable.AddCell(dt.Rows[0]["Candidate_Name"].ToString());
+
+                    ExamDetailTable.AddCell(new Phrase("Sex:", bodyFont));
+                    ExamDetailTable.AddCell(dt.Rows[0]["Sex_Code"].ToString());
+
+                    ExamDetailTable.AddCell(new Phrase("Designation:", bodyFont));
+                    ExamDetailTable.AddCell(dt.Rows[0]["Designation"].ToString());
+
+                    ExamDetailTable.AddCell(new Phrase("Qualification:", bodyFont));
+                    ExamDetailTable.AddCell(dt.Rows[0]["Qualification"].ToString());
+
+                    ExamDetailTable.AddCell(new Phrase("Mobile No:", bodyFont));
+                    ExamDetailTable.AddCell(dt.Rows[0]["Mobile_No"].ToString());
+
+                    ExamDetailTable.AddCell(new Phrase("Country:", bodyFont));
+                    ExamDetailTable.AddCell(dt.Rows[0]["Country_Name"].ToString());
+
+                    
+                    //ExamDetailTable.AddCell(iTextSharp.text.Image.GetInstance(Server.MapPath("~//Upload//Signature//" + dt.Rows[0]["Signature_Filename"].ToString())));
+
+                    //ExamDetailTable.AddCell(new Phrase("Exam Date:" + dt.Rows[0]["Exam_Date"].ToString(), bodyFont));
+
+                    //ExamDetailTable.AddCell(new Phrase("Exam Time:" + dt.Rows[0]["Exam_time"].ToString(), bodyFont));
+                    //ExamDetailTable.AddCell(new Phrase("Reporting Time:" + "30 Minutes before Start Time", bodyFont));
+                    //ExamDetailTable.AddCell(new Phrase("Exam Duration:" + "2 Hours", bodyFont));
+                    document.Add(ExamDetailTable);
+                    
+                    //$$$$$$$$$$$
+                    
+                    //document.Add(Chunk.NEWLINE);
+                    //document.Add(Chunk.NEWLINE);
+                    //document.Add(new Phrase("", boldTableFont));
+                    //document.Add(Chunk.NEWLINE);
+                    //var InstructionsTable = new PdfPTable(1);
+                    //InstructionsTable.TotalWidth = 500f;
+                    //InstructionsTable.LockedWidth = true;
+                    //InstructionsTable.AddCell(new Phrase(Chunk.NEWLINE + "Important Instructions to the Candidate" + Chunk.NEWLINE + Chunk.NEWLINE, bodyFont));
+                    //InstructionsTable.AddCell(new Phrase("1. Please ensure to bring this admit card at the examination centre, failing which you will not be allowed to enter in the examination centre. Also please keep this Amit Card with you for future record."
+                    //                                     + Chunk.NEWLINE + Chunk.NEWLINE
+                    //                                     + "2. Candidate is advised to reach 30 minutes before commencement of examination (i.e 10:00 A.M on Date of Exam) and occupy his/her seat in the respective classroom for filling up necessary details on the OMR answer sheet. No candidate will be allowed to enter the Examination Centre after expiry of 30 minutes from the schedule time of commencement of examination."
+                    //                                     + Chunk.NEWLINE + Chunk.NEWLINE
+                    //                                     + "3. The Schedule of the examination will remain unaltered even if the date of examination is declared a public holiday."
+                    //                                     + Chunk.NEWLINE + Chunk.NEWLINE
+                    //                                     + "4. The candidates are advised to submit the question paper as well as answer sheet to the invigilator after the completion of the examination. No candidate would be allowed to leave without handing over of Answer Sheet & Question Paper."
+                    //                                     + Chunk.NEWLINE + Chunk.NEWLINE
+                    //                                     + "5. The paper will contain 100 objective type questions with four multiple choices."
+                    //                                     + Chunk.NEWLINE + Chunk.NEWLINE
+                    //                                     + "6. Possession and use of electronic devices such as Calculator, Digital Diary, Pager and Log Tables etc. is strictly prohibited. Issuing Authority."
+                    //                                     + Chunk.NEWLINE + Chunk.NEWLINE
+                    //                                     + "7. Please do not bring mobile phone at the Examination Centre. School authorites will not be held responsible for lost of the same."
+                    //                                     + Chunk.NEWLINE + Chunk.NEWLINE
+                    //                                     + "8. Your Candidature is provisional subject to your eligibility regarding age and academic Qualification."
+                    //                                     + Chunk.NEWLINE + Chunk.NEWLINE
+                    //                                     + "9. Mere appearance in the written test does not guarantee admission to the Course.", bodyFont));
+
+                    //document.Add(InstructionsTable);
+                    //document.Add(new Paragraph("*This is Computer Generated document, It doesn't require any signature or stamp.", SmallText));
+                    //document.Add(Chunk.NEWLINE);
+
+                    document.Close();
+
+                    Response.ContentType = "application/pdf";
+                    Response.AddHeader("Content-Disposition", string.Format("attachment;filename=Admit_Card-{0}.pdf", dt.Rows[0]["Candidate_Name"].ToString() + "_" + Convert.ToInt64(dt.Rows[0]["Registration_Number"].ToString()).ToString()));
+                    Response.BinaryWrite(output.ToArray());
+
+                }
+                else
+                {
+                    lblError.Text = "No Record Found";
+                    lblError.Visible = true;
+                }
+
+            }
+            //###########            
+
+        }
+    }
+
+    protected void btnchkSum_Click(object sender, EventArgs e)
+    {
+        //String data = "TEST|123456|NA|2.00|NA|NA|NA|INR|DIRECT|R|test|NA|NA|F|31111111|TEST|test@test.com|1111111111|TEST|NA|NA|https://www.billdesk.com|Test123";
+        //SHASample dataprg = new SHASample();
+        //String hash = String.Empty;
+        //hash = dataprg.GetSHA256(data);
+        //Console.Out.WriteLine("CRC32_2 {0}", hash);
+        //Console.ReadKey();
+
+        //NIELIT|10000008|NA|2.00|NA|NA|NA|INR|NA|R|nielit|NA|NA|F|1|BCAS01|1|NA|NA|NA|NA|http://bcastest.nielit.in/Forms/DetailsForms/PaymentResponse.aspx|791D345B65288A90D8446267C5C3F8F101A27B6028392647AF4CB7C62970D338
+        String data = "NIELIT|10000008|NA|2.00|NA|NA|NA|INR|NA|R|nielit|NA|NA|F|1|BCAS01|1|NA|NA|NA|NA|http://bcastest.nielit.in/Forms/DetailsForms/PaymentResponse.aspx|WYZZHkyZuU9K";
+        SHASample dataprg = new SHASample();
+        String hash = String.Empty;
+        hash = dataprg.GetSHA256(data);
+        lblError.Text = hash.ToUpper ();
+        lblError.Visible = true;
+        //Console.Out.WriteLine("CRC32_2 {0}", hash);
+        //Console.ReadKey();
+
+    }
+}

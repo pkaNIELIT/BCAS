@@ -1,0 +1,205 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeFile="MasterPage.master.cs" Inherits="MasterPage" %>
+
+<%@ Register assembly="AjaxControlToolkit" namespace="AjaxControlToolkit" tagprefix="cc1" %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title>Untitled Page</title>
+    <asp:ContentPlaceHolder id="head" runat="server">
+    </asp:ContentPlaceHolder>
+      
+     <script type="text/javascript" language="javascript">
+
+       function DisableBackButton() {
+
+           window.history.forward()
+
+       }
+       DisableBackButton();
+       window.onload = DisableBackButton;
+       window.onpageshow = function(evt) { if (evt.persisted) DisableBackButton() }
+       window.onunload = function() { void (0) }
+            
+ 
+</script>
+
+    
+    <style>
+        body
+        {
+            background-position: 50% 50%;
+            margin: 0px;
+            padding: 0px !important;
+            height: 100%;
+        }
+    </style>
+
+    <style>
+        div
+        {
+            margin: 0;
+        }
+        table
+        {
+            margin: 0px;
+            border-collapse: collapse;
+            padding: 0px;
+        }
+    </style>
+    
+  <%-- <script type="text/javascript" language="javascript">
+        window.moveTo(0, 0);
+        window.resizeTo(screen.width, screen.height);
+    </script>
+    --%>
+</head>
+<body>
+    <form id="form1" runat="server" autocomplete="off">
+    <div id="selector" align="center"  >
+        <table width="100%" align="center" cellspacing="0" border="0" >
+            <tr>
+                <td  width="5%" bgcolor="#09638e">
+                </td>
+                <td width="90%">                
+                    <table width="100%">
+                        <tr>
+                            <td>                                                        
+                            <%--<asp:Image ID="Image1" runat="server" ImageUrl="~/Images/20-5-2013.jpg" Height="200px" Width="100%" />--%>
+                            <asp:Image ID="Image3" runat="server" ImageUrl="~/Images/bcas2.png" Height="150px" Width="100%" />
+                            </td>
+                        </tr>
+                        <tr bgcolor="#09638e">
+                            <td height="5px">
+                            
+                               </td>
+                        </tr>
+                         <tr>
+                            <td>
+                                <table width="100%" bgcolor="#FBEBE6">
+                                    <tr>
+                                        <td width="100%">
+                                            <table width="100%">
+                                                <tr bgcolor="#99CCFF">
+                                                    <td width="20%" align="left" >
+                                                    <asp:Label ID="lblWelcome" runat="server" Visible="False"></asp:Label>
+&nbsp;<asp:LoginView ID="ctlRightNavbar" runat="server">
+                                     <AnonymousTemplate>
+                                        <%-- <a class="navbar"></a>--%>
+                                     </AnonymousTemplate>
+                                     <LoggedInTemplate>
+                                      <%--<a class="navbar">Welcome: 
+                                             <asp:LoginName ID="ctlUserName" runat="server" />
+                                         </a>--%>
+                                    <asp:LoginName ID="ctlUserName" runat="server" />
+                                     </LoggedInTemplate>
+                                 </asp:LoginView>
+                                                    </td>
+                                                    <td width="65%" align="center" ><b>Online System of Registration for BCAS Training </b></td>
+                                                    <td width="15%" align="right" >
+                                                   <%-- <asp:LinkButton ID="lnkHome" runat="server" 
+                                                CausesValidation="False" Visible="False" onclick="lnkHome_Click"></asp:LinkButton>--%>
+                                                <asp:LoginStatus ID="LoginStatus" runat="server" 
+                                LogoutPageUrl="~/Home.aspx"  onloggedout="LoginStatus_LoggedOut" 
+                                Visible="False" />
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>                               
+                                   <tr>
+                                        <td valign="top" style="width: 20%; text-align: left;" align="right" 
+                                            bgcolor="White"  >
+                                        <asp:Menu ID="Menu1" runat="server" BorderColor="#333333" 
+                    BorderStyle="None" DynamicHorizontalOffset="2" Font-Names="Arial Narrow" 
+                    Font-Size="15px" ForeColor="#990000" Orientation="Horizontal">
+                                                 <StaticSelectedStyle ItemSpacing="5px" />
+                                                 <StaticMenuItemStyle ItemSpacing="15px" />
+                                                 <DynamicMenuStyle BorderColor="#6A0C23" CssClass="DynamicMenuZIndex" 
+                                                     HorizontalPadding="10px" VerticalPadding="2px" />
+                                                 <DynamicMenuItemStyle BorderColor="#6A0C23" BorderWidth="1px" 
+                        HorizontalPadding="10px" ItemSpacing="2px" VerticalPadding="2px" BackColor ="White"  />
+                                             </asp:Menu>                                                                                                               
+                                            </td>
+                                    </tr>
+                                    <tr align="center" >                                    
+                                        <td valign="top" style="width: 20%" height="500px" >
+                                                                                                                                   
+                                          <cc1:ToolkitScriptManager ID="ToolkitScriptManager1" runat="server">
+                                            </cc1:ToolkitScriptManager>
+                                                                                                                                          
+                                         <asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server">
+                                             
+                                         </asp:ContentPlaceHolder>                                         
+                                            
+                                        </td>
+                                    </tr>
+                                    </table>
+                            </td>
+                        </tr>                        
+                         <%-- <tr>                          
+                            <td style="border-top:thin solid #09638e; border-bottom :thin solid #09638e; text-align: center;" >
+                            <table align="center" width="100%">
+                                <tr align="center" >
+                                    <td align="center" >
+                                     <asp:Menu ID="Menu2" runat="server"  Font-Bold="False" 
+                                                Font-Size="Medium" ForeColor="Black" Orientation="Horizontal" 
+                                    Font-Names="Calibri">
+                                                <StaticMenuItemStyle HorizontalPadding="5px" />
+                                                <DynamicHoverStyle BackColor="#3e9ec9" ForeColor="White" />
+                                                <DynamicMenuStyle BorderColor="Black" BorderStyle="Solid" BorderWidth="1px" />
+                                                <DynamicMenuItemStyle BackColor="#3e9ec9" ForeColor="Black" VerticalPadding="3px" />
+                                                <StaticHoverStyle BackColor="#3e9ec9" ForeColor="White" />
+                                                <Items>
+                                                    <asp:MenuItem Enabled="False" Text="|" Value="|"></asp:MenuItem>
+                                                    <asp:MenuItem Text="Website Policies" Value="Website Policies">
+                                                    </asp:MenuItem>
+                                                    <asp:MenuItem Text="|" Value="|" Enabled="False"></asp:MenuItem>
+                                                    <asp:MenuItem Text="Help" Value="Help">
+                                                    </asp:MenuItem>
+                                                    <asp:MenuItem Text="|" Value="|" Enabled="False"></asp:MenuItem>
+                                                    <asp:MenuItem Text="Terms &amp; Conditions" Value="Terms &amp; Conditions">
+                                                    </asp:MenuItem>
+                                                    <asp:MenuItem Text="|" Value="|" Enabled="False"></asp:MenuItem>
+                                                    <asp:MenuItem Text="Sitemap" Value="Sitemap">
+                                                    </asp:MenuItem>
+                                                    <asp:MenuItem Enabled="False" Text="|" Value="|"></asp:MenuItem>
+                                                </Items>
+                                            </asp:Menu>
+                                    </td>
+                                </tr>
+                            </table>
+                           
+                                </td>
+                            
+                         </tr>--%>                      
+                                
+                         <tr>
+                            <td style="border-top:thin solid #09638e; border-bottom :thin solid #09638e; text-align: center;" bgcolor="#ff5b0d">
+                                <asp:Label ID="lblfooter1" runat="server" ForeColor="White" Text="Designed and Developed by:"></asp:Label>
+                                &nbsp;<asp:HyperLink ID="hlfooter3" runat="server" NavigateUrl="http://www.nielit.in/index.jsp"
+                                    ForeColor="White" Target="http://www.nielit.in/index.jsp" 
+                                    Text="National Institute of Electronics and Information Technology (NIELIT) Delhi Centre"></asp:HyperLink>&nbsp;</td>
+                        </tr>
+                                
+                         <tr>
+                       <td bgcolor="#09638e" align="center">
+                                <asp:Label ID="Label2" runat="server" ForeColor="White" Text="This site is best optimized for 1366 x 768 screen resolution and IE 9.0 & above"></asp:Label>
+                                &nbsp;</td>
+                                </tr>
+                              </td>
+            </tr>
+                        
+         </table>
+                </td>
+                <td width="5%" bgcolor="#09638e">
+                </td>
+            </tr>
+        </table>
+    </div>
+    </form>
+</body>
+</html>

@@ -1,0 +1,906 @@
+using System;
+using System.Collections;
+using System.Configuration;
+using System.Data;
+using System.Linq;
+using System.Web;
+using System.Web.Security;
+using System.Web.UI;
+using System.Web.UI.HtmlControls;
+using System.Web.UI.WebControls;
+using System.Web.UI.WebControls.WebParts;
+using System.Xml.Linq;
+using System.Data.SqlClient;
+using BCASClassLibrary;
+using System.IO;
+
+public partial class Relieved_Candidates_Updation : System.Web.UI.Page
+{
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        if (!Page.IsPostBack)
+        {
+            if ((Convert.ToString(HttpContext.Current.Session["UserId"]).Trim().Length == 0))
+            {
+                HttpContext.Current.Response.Redirect("~/Home.aspx");
+            }
+            else
+            {
+                enabled_disabled_controls('L');
+            }
+        }
+    }
+    protected void btn_insert_Click(object sender, EventArgs e)
+    {
+        lbl_choice.Text = "I";
+        enabled_disabled_controls('I');
+        txt_employee_id.Focus();
+    }
+
+    protected void btn_update_Click(object sender, EventArgs e)
+    {
+        lbl_choice.Text = "U";
+        enabled_disabled_controls('U');
+        txt_employee_id.Focus();
+    }
+
+    protected void btn_search_Click(object sender, EventArgs e)
+    {
+        lbl_choice.Text = "F";
+        enabled_disabled_controls('F');
+        txt_employee_id.Focus();
+    }
+
+    protected void btn_save_Click(object sender, EventArgs e)
+    {
+        if (lbl_choice.Text == "I" || lbl_choice.Text == "U")
+        {
+            lbl_errors.Visible = true;
+            if (!ValidateData())
+                return;
+            lbl_errors.Visible = false;
+        }
+
+        try
+        {
+            TYP_CANDIDATE_REGISTRATION newobj = new TYP_CANDIDATE_REGISTRATION();
+            newobj.ORGANISATION_CODE = Convert.ToInt32(ddl_OrgCode.SelectedValue);
+            newobj.EMPLOYEE_ID = txt_employee_id.Text.ToUpper();
+            newobj.CANDIDATE_NAME = txt_candidate_name.Text.ToUpper();
+            newobj.SEX_CODE = ddl_gender_code.SelectedValue;
+            newobj.DESIGNATION_CODE = Convert.ToInt32(ddl_Designation.SelectedValue);
+            newobj.DOB = DateTime.ParseExact(txt_dob.Text, "dd/MM/yyyy", new System.Globalization.DateTimeFormatInfo());
+            newobj.EMAIL_ID = txt_email_id.Text.ToUpper();
+            newobj.MOBILE_NO = txt_mobile_no.Text.ToUpper();
+            newobj.NATIONALITY_CODE = Convert.ToInt32(ddl_Nationality.SelectedValue);
+            newobj.EDUCATIONAL_QUALIFICATION_CODE = Convert.ToInt32(ddl_Qualification .SelectedValue );
+            if (lbl_choice.Text == "I")
+                newobj.REGISTRATION_NUMBER = 0;
+            else
+                newobj.REGISTRATION_NUMBER = Convert.ToInt32(txt_registration_number.Text);
+            newobj.ENTER_DATE = DateTime.Now;
+            newobj.ENTER_BY = HttpContext.Current.User.Identity.Name;
+
+            switch (lbl_choice.Text)
+            {
+                case "I":
+                    txt_registration_number.Text = TYP_CANDIDATE_REGISTRATION.InsertCandidate_Registration(newobj).ToString();
+                    lbl_error.Text = " Record Successfully Saved ";
+                    break;
+                case "U":
+                    TYP_CANDIDATE_REGISTRATION.UpdateCandidate_Registration_Relieved(newobj);
+                    lbl_error.Text = " Record Successfully Updated ";
+                    break;
+                case "D":
+                    TYP_CANDIDATE_REGISTRATION.DeleteCandidate_Registration(Convert.ToInt32(txt_registration_number.Text));
+                    lbl_error.Text = " Record Successfully Deleted ";
+                    break;
+            }
+
+            GridParameter("-1", "*", "*", "*", "-1", "01/01/1900", "*", "*", "-1", "-1", txt_registration_number.Text);
+            enabled_disabled_controls('S');
+        }
+        catch (SqlException ex)
+        {
+            Int32 ErrorCode = ex.Number;
+
+            switch (ErrorCode)
+            {
+                case 2627:
+                    lbl_error.Text = "Primary key Already Exists, unique constraint violated";
+                    break;
+                default:
+                    lbl_error.Text = ex.Message;
+                    break;
+            }
+            enabled_disabled_controls('N');
+        }
+
+        finally
+        {
+            btn_insert.Focus();
+        }
+    }
+
+    protected void btn_cancel_Click(object sender, EventArgs e)
+    {
+        enabled_disabled_controls('C');
+        btn_insert.Focus();
+    }
+
+    protected void GridView1_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        ddl_NewOrgCode .SelectedValue  = GridView1.SelectedRow.Cells[1].Text;
+        txt_employee_id.Text = GridView1.SelectedRow.Cells[2].Text;
+        txt_candidate_name.Text = GridView1.SelectedRow.Cells[3].Text;
+        ddl_gender_code.SelectedValue = GridView1.SelectedRow.Cells[4].Text;
+        ddl_Designation.SelectedValue  = GridView1.SelectedRow.Cells[5].Text;
+        txt_dob.Text = Convert.ToDateTime(GridView1.SelectedRow.Cells[6].Text).Date.ToString("dd/MM/yyyy");
+        txt_email_id.Text = GridView1.SelectedRow.Cells[7].Text;
+        txt_mobile_no.Text = GridView1.SelectedRow.Cells[8].Text;
+        ddl_Nationality.SelectedValue  = GridView1.SelectedRow.Cells[9].Text;
+        ddl_Qualification.SelectedValue = GridView1.SelectedRow.Cells[10].Text;
+        txt_registration_number.Text = GridView1.SelectedRow.Cells[11].Text;
+        enabled_disabled_controls('G');
+    }
+
+    void enabled_disabled_controls(char choice)
+    {
+        switch (choice)
+        {
+            case 'L': //Login
+                lbl_error.Text = "";
+                btn_insert.Enabled = true;
+                btn_search.Enabled = true;
+                btn_update.Enabled = false;
+                btn_save.Enabled = false;
+                btn_cancel.Enabled = false;
+                btn_quit.Enabled = true;
+                enabled_disabled_validation(false);
+                frm_panel.Enabled = false;
+                break;
+
+            case 'N':  //Exception
+                btn_insert.Enabled = false;
+                btn_search.Enabled = false;
+                btn_update.Enabled = false;
+                btn_save.Enabled = true;
+                btn_cancel.Enabled = true;
+                btn_quit.Enabled = true;
+                frm_panel.Enabled = true;
+                enabled_disabled_validation(true);
+                enabled_disabled_controls(true);
+                break;
+            case 'S':
+                // on save
+                btn_insert.Enabled = true;
+                btn_search.Enabled = true;
+                btn_update.Enabled = false;
+                btn_save.Enabled = false;
+                btn_cancel.Enabled = false;
+                btn_quit.Enabled = true;
+
+                enabled_disabled_validation(false);
+                frm_panel.Enabled = false;
+                enabled_disabled_controls(false);
+                clear_contents();
+                break;
+            case 'C':
+                //on  cancel
+                btn_insert.Enabled = true;
+                btn_search.Enabled = true;
+                btn_update.Enabled = false;
+                btn_save.Enabled = false;
+                btn_cancel.Enabled = false;
+                btn_quit.Enabled = true;
+
+                enabled_disabled_validation(false);
+                frm_panel.Enabled = false;
+                enabled_disabled_controls(false);
+                clear_contents();
+                break;
+            case 'I':
+                lbl_error.Text = "";
+                btn_insert.Enabled = false;
+                btn_update.Enabled = false;
+                btn_search.Enabled = false;
+                btn_quit.Enabled = true;
+                btn_save.Enabled = true;
+                btn_cancel.Enabled = true;
+                frm_panel.Enabled = true;
+                enabled_disabled_validation(true);
+                enabled_disabled_controls(true);
+                txt_registration_number.Enabled = false;
+                break;
+            case 'F':
+                btn_insert.Enabled = false;
+                btn_search.Enabled = false;
+                btn_update.Enabled = false;
+                btn_quit.Enabled = false;
+                btn_save.Enabled = false;
+                btn_cancel.Enabled = true;
+                frm_panel.Enabled = true;
+                enabled_disabled_validation(false);
+                enabled_disabled_controls(true);
+                break;
+            case 'U':
+                btn_insert.Enabled = false;
+                btn_update.Enabled = false;
+                btn_search.Enabled = false;
+                btn_quit.Enabled = false;
+                btn_save.Enabled = true;
+                btn_cancel.Enabled = true;
+                frm_panel.Enabled = true;
+                enabled_disabled_validation(true);
+                enabled_disabled_controls(true);
+                txt_registration_number.Enabled = false;
+                break;
+            case 'G':
+                lbl_error.Text = "";
+                btn_insert.Enabled = false;
+                btn_search.Enabled = false;
+                btn_update.Enabled = true;
+                btn_quit.Enabled = true;
+                btn_save.Enabled = false;
+                btn_cancel.Enabled = true;
+
+                enabled_disabled_validation(false);
+                frm_panel.Enabled = false;
+                break;
+        };
+    }
+
+    void clear_contents()
+    {
+        lbl_choice.Text = "";
+        lbl_error.Text = "";
+        ddl_OrgCode.SelectedIndex = 0;
+        txt_employee_id.Text = "";
+        txt_candidate_name.Text = "";
+        ddl_gender_code.SelectedIndex = 0;
+        ddl_Designation.SelectedIndex = 0;
+        txt_dob.Text = "";
+        txt_email_id.Text = "";
+        txt_mobile_no.Text = "";
+        ddl_Nationality.SelectedIndex = 0;
+        ddl_Qualification.SelectedIndex = 0;
+        txt_registration_number.Text = "";
+    }
+
+    void enabled_disabled_controls(bool flag)
+    {
+        ddl_OrgCode.Enabled = flag;
+        txt_employee_id.Enabled = flag;
+        txt_candidate_name.Enabled = flag;
+       ddl_gender_code.Enabled = flag;
+        ddl_Designation .Enabled = flag;
+        txt_dob.Enabled = flag;
+        txt_email_id.Enabled = flag;
+        txt_mobile_no.Enabled = flag;
+        ddl_Nationality.Enabled = flag;
+        ddl_Qualification.Enabled = flag;
+        txt_registration_number.Enabled = flag;
+    }
+
+    void enabled_disabled_validation(bool flag)
+    {
+        //mev_organisation_code.Enabled = flag;
+        mev_employee_id.Enabled = flag;
+        mev_candidate_name.Enabled = flag;
+        //mev_sex_code.Enabled = flag;
+        //mev_designation_code.Enabled = flag;
+        mev_dob.Enabled = flag;
+        mev_email_id.Enabled = flag;
+        mev_mobile_no.Enabled = flag;
+        //mev_nationality_code.Enabled = flag;
+        //mev_educational_qualification_code.Enabled = flag;
+    }
+    protected void btn_quit_Click(object sender, EventArgs e)
+    {
+        Response.Redirect("~/HomePage.aspx");
+    }
+    protected void GridView1_RowDataBound(object sender, GridViewRowEventArgs e)
+    {
+        if (e.Row.RowType == DataControlRowType.Header)
+        {
+            foreach (DataControlFieldCell cell in e.Row.Cells)
+            {
+                cell.Width = cell.Text.Trim().Length;
+            }
+        }
+        else if (e.Row.RowType == DataControlRowType.DataRow)
+            {
+            if (e.Row.Cells.Count > 6 && !string.IsNullOrEmpty(e.Row.Cells[6].Text.Trim()))
+            {
+                DateTime dt6;
+                if (DateTime.TryParse(e.Row.Cells[6].Text, out dt6))
+                    e.Row.Cells[6].Text = dt6.Date.ToString("dd-MMM-yyyy").ToUpper().Trim();
+            }
+            if (e.Row.Cells.Count > 16 && !string.IsNullOrEmpty(e.Row.Cells[16].Text.Trim()))
+            {
+                DateTime dt16;
+                if (DateTime.TryParse(e.Row.Cells[16].Text, out dt16))
+                    e.Row.Cells[16].Text = dt16.Date.ToString("dd-MMM-yyyy").ToUpper().Trim();
+            }
+            }
+    }
+
+    protected void btn_display_Click(object sender, EventArgs e)
+    {
+        lbl_error.Text = "";
+        string pOrganisation_Code, pEmployee_ID, pCandidate_Name, pSex_Code, pDesignation_Code, pDOB, pEmail_Id, pMobile_No, pNationality_Code, pEducational_Qualification_Code, pRegistration_Number;
+
+        if (ddl_OrgCode.SelectedIndex == 0)
+            pOrganisation_Code = "-1";
+        else
+            pOrganisation_Code = ddl_OrgCode.SelectedValue;
+
+        if (txt_employee_id.Text == "")
+            pEmployee_ID = "*";
+        else
+            pEmployee_ID = txt_employee_id.Text.ToUpper();
+
+        if (txt_candidate_name.Text == "")
+            pCandidate_Name = "*";
+        else
+            pCandidate_Name = txt_candidate_name.Text.ToUpper();
+
+        if (ddl_gender_code.SelectedIndex  == 0)
+            pSex_Code = "*";
+        else
+            pSex_Code = ddl_gender_code.SelectedValue ;
+
+        if (ddl_Designation.SelectedIndex == 0)
+            pDesignation_Code = "-1";
+        else
+            pDesignation_Code =ddl_Designation.SelectedValue;
+
+        if (txt_dob.Text == "")
+            pDOB = "01/01/1900";
+        else
+            pDOB = txt_dob.Text.ToUpper();
+
+        if (txt_email_id.Text == "")
+            pEmail_Id = "*";
+        else
+            pEmail_Id = txt_email_id.Text.ToUpper();
+
+        if (txt_mobile_no.Text == "")
+            pMobile_No = "*";
+        else
+            pMobile_No = txt_mobile_no.Text.ToUpper();
+
+        if (ddl_Nationality.SelectedIndex == 0)
+            pNationality_Code = "-1";
+        else
+            pNationality_Code = ddl_Nationality.SelectedValue;
+
+        if (ddl_Qualification.SelectedIndex  == 0)
+            pEducational_Qualification_Code = "-1";
+        else
+            pEducational_Qualification_Code = ddl_Qualification.SelectedValue ;
+
+        if (txt_registration_number.Text == "")
+            pRegistration_Number = "-1";
+        else
+            pRegistration_Number = txt_registration_number.Text.ToUpper();
+
+        //-----Setting Grid Parameters-----------------------------------------
+        grd_panel.Visible = true;
+        GridParameter(pOrganisation_Code, pEmployee_ID, pCandidate_Name, pSex_Code, pDesignation_Code, pDOB, pEmail_Id, pMobile_No, pNationality_Code, pEducational_Qualification_Code, pRegistration_Number);
+    }
+
+    private void GridParameter(string pOrganisation_Code, string pEmployee_ID, string pCandidate_Name, string pSex_Code, string pDesignation_Code, string pDOB, string pEmail_Id, string pMobile_No, string pNationality_Code, string pEducational_Qualification_Code, string pRegistration_Number)
+    {
+        Parameter objOrganisation_CodeParameter = new Parameter("pOrganisation_Code", TypeCode.String, pOrganisation_Code);
+        Parameter objEmployee_IDParameter = new Parameter("pEmployee_ID", TypeCode.String, pEmployee_ID);
+        Parameter objCandidate_NameParameter = new Parameter("pCandidate_Name", TypeCode.String, pCandidate_Name);
+        Parameter objSex_CodeParameter = new Parameter("pSex_Code", TypeCode.String, pSex_Code);
+        Parameter objDesignation_CodeParameter = new Parameter("pDesignation_Code", TypeCode.String, pDesignation_Code);
+        Parameter objDOBParameter = new Parameter("pDOB", TypeCode.DateTime , pDOB);
+        Parameter objEmail_IdParameter = new Parameter("pEmail_Id", TypeCode.String, pEmail_Id);
+        Parameter objMobile_NoParameter = new Parameter("pMobile_No", TypeCode.String, pMobile_No);
+        Parameter objNationality_CodeParameter = new Parameter("pNationality_Code", TypeCode.String, pNationality_Code);
+        Parameter objEducational_Qualification_CodeParameter = new Parameter("pEducational_Qualification_Code", TypeCode.String, pEducational_Qualification_Code);
+        Parameter objRegistration_NumberParameter = new Parameter("pRegistration_Number", TypeCode.String, pRegistration_Number);
+
+        //set up object data source parameters
+        ObjectDataSource1.SelectParameters["pOrganisation_Code"] = objOrganisation_CodeParameter;
+        ObjectDataSource1.SelectParameters["pEmployee_ID"] = objEmployee_IDParameter;
+        ObjectDataSource1.SelectParameters["pCandidate_Name"] = objCandidate_NameParameter;
+        ObjectDataSource1.SelectParameters["pSex_Code"] = objSex_CodeParameter;
+        ObjectDataSource1.SelectParameters["pDesignation_Code"] = objDesignation_CodeParameter;
+        ObjectDataSource1.SelectParameters["pDOB"] = objDOBParameter;
+        ObjectDataSource1.SelectParameters["pEmail_Id"] = objEmail_IdParameter;
+        ObjectDataSource1.SelectParameters["pMobile_No"] = objMobile_NoParameter;
+        ObjectDataSource1.SelectParameters["pNationality_Code"] = objNationality_CodeParameter;
+        ObjectDataSource1.SelectParameters["pEducational_Qualification_Code"] = objEducational_Qualification_CodeParameter;
+        ObjectDataSource1.SelectParameters["pRegistration_Number"] = objRegistration_NumberParameter;
+
+        //Rebinding Data Grid
+        GridView1.DataBind();
+    }
+
+   
+
+    protected bool ValidateData()
+    {
+        bool valid = true;
+        bullet_errors.Items.Clear();
+        //--------------------------------------------------------------------
+       
+        mev_employee_id.Validate();
+        if (!mev_employee_id.IsValid)
+        {
+            bullet_errors.Items.Add("Employee ID must be Entered");
+            valid = false;
+        }
+
+        mev_candidate_name.Validate();
+        if (!mev_candidate_name.IsValid)
+        {
+            bullet_errors.Items.Add("Candidate Name must be Entered");
+            valid = false;
+        }
+
+        //mev_sex_code.Validate();
+        //if (!mev_sex_code.IsValid)
+        //{
+        //    bullet_errors.Items.Add("Sex Code must be Entered");
+        //    valid = false;
+        //}
+
+        //mev_designation_code.Validate();
+        //if (!mev_designation_code.IsValid)
+        //{
+        //    bullet_errors.Items.Add("Designation Code must be Entered");
+        //    valid = false;
+        //}
+
+        mev_dob.Validate();
+        if (!mev_dob.IsValid)
+        {
+            bullet_errors.Items.Add("DOB must be Entered");
+            valid = false;
+        }
+
+        mev_email_id.Validate();
+        if (!mev_email_id.IsValid)
+        {
+            bullet_errors.Items.Add("Email Id must be Entered");
+            valid = false;
+        }
+
+        mev_mobile_no.Validate();
+        if (!mev_mobile_no.IsValid)
+        {
+            bullet_errors.Items.Add("Mobile No must be Entered");
+            valid = false;
+        }
+
+        //mev_nationality_code.Validate();
+        //if (!mev_nationality_code.IsValid)
+        //{
+        //    bullet_errors.Items.Add("Nationality Code must be Entered");
+        //    valid = false;
+        //}
+
+        //mev_educational_qualification_code.Validate();
+        //if (!mev_educational_qualification_code.IsValid)
+        //{
+        //    bullet_errors.Items.Add("Educational Qualification Code must be Entered");
+        //    valid = false;
+        //}
+
+        return valid;
+    }
+}
+
+
+
+<%@ Page Language="C#" EnableEventValidation="false" MasterPageFile="~/MasterPage.master"
+    AutoEventWireup="true" Culture="en-GB" UICulture="auto" 
+CodeFile="Relieved_Candidates_Updation.aspx.cs" Inherits="Relieved_Candidates_Updation" Title="Candidate_Registration" %>
+
+<%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="cc1" %>
+<asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolder1" runat="Server">
+    <table width="100%" align="center" bgcolor="#FBEBE6">
+        <tr>
+            <td style="height: 21px" align="center">
+                &nbsp;</td>
+        </tr>
+        <tr>
+            <td style="height: 21px" align="center">
+                &nbsp;</td>
+        </tr>
+        <tr>
+            <td style="height: 21px" align="center">
+                <asp:Label ID="lbl_Heading" runat="server" meta:resourcekey="lbl_Heading" 
+                    EnableTheming="True" style="font-weight: 700"></asp:Label>
+            </td>
+        </tr>
+        <tr>
+            <td style="height: 21px" align="center">
+                &nbsp;</td>
+        </tr>
+        <tr>
+            <td style="height: 35%" align="center">
+                <asp:UpdatePanel ID="UpdatePanel1" runat="server">
+                    <ContentTemplate>
+                        <table style="height: 34%">
+                            <tr>
+                                <td style="height: 70%">
+                                    <asp:Panel ID="frm_panel" runat="server" Enabled="false">
+                                        <table style="height: 70%; width: auto;" border="1">
+                                            <tr>
+                                                <td align="left">
+                                                    <asp:Label ID="lbl_organisation_code" runat="server" meta:resourcekey="lbl_organisation_code"></asp:Label>
+                                                </td>
+                                                <td style="width: 87px; height: 16px" align="left">
+                                                <asp:DropDownList ID="ddl_OrgCode" runat="server" DataSourceID="SqlDataSource1"
+                                            DataTextField="Organisation_Name" DataValueField="Organisation_Code" TabIndex="1"
+                                            Width="250px" Enabled="False" AppendDataBoundItems="True">
+                                            <asp:ListItem Value="0" >--Select--</asp:ListItem>
+                                        </asp:DropDownList>
+                                                    <asp:RegularExpressionValidator ID="rev_OrgCode" runat="server" ControlToValidate="ddl_OrgCode"
+                                            ErrorMessage="*" SetFocusOnError="True" ValidationExpression="^[1-9[0-9][0-9]*" ></asp:RegularExpressionValidator>
+                                                    <%--<asp:TextBox ID="txt_organisation_code" runat="server" Width="336px" MaxLength="10"></asp:TextBox>
+                                                    <cc1:MaskedEditExtender ID="mee_organisation_code" runat="server" TargetControlID="txt_organisation_code"
+                                                          Mask="9999999999" PromptCharacter="">
+                                                    </cc1:MaskedEditExtender>
+                                                    <cc1:MaskedEditValidator ID="mev_organisation_code" runat="server" ControlExtender="mee_organisation_code"
+                                                          ControlToValidate="txt_organisation_code" EmptyValueMessage="Organisation Code must be entered"
+                                                          IsValidEmpty="false" Display="None"></cc1:MaskedEditValidator>
+                                                    <cc1:ValidatorCalloutExtender ID="vce_organisation_code" runat="server" TargetControlID="mev_organisation_code">
+                                                    </cc1:ValidatorCalloutExtender>--%>
+                                                    <asp:SqlDataSource ID="SqlDataSource1" runat="server"
+                                                        ConnectionString="<%$ ConnectionStrings:BCASConnectionString %>"
+                                                        SelectCommand="SELECT [Organisation_Code], [Organisation_Name] FROM [Sponsoring_Organisation_Master] ORDER BY [Organisation_Name]">
+                                                    </asp:SqlDataSource>
+                                                </td>
+                                            </tr>
+                                            
+                                            <tr> 
+                                            <td style="text-align: left">Previous Organisation</td>
+                                            <td align="left">
+                                                <asp:DropDownList ID="ddl_NewOrgCode" runat="server" 
+                                                    DataSourceID="SqlDataSource2" AppendDataBoundItems="True" 
+                                                    DataTextField="Organisation_Name" DataValueField="Organisation_Code" 
+                                                    Enabled="False" Width="250px">
+                                                    <asp:ListItem Value="0">Select</asp:ListItem>
+                                                </asp:DropDownList>
+                                                <asp:SqlDataSource ID="SqlDataSource2" runat="server" 
+                                                    ConnectionString="<%$ ConnectionStrings:BCASConnectionString %>" 
+                                                    SelectCommand="SELECT [Organisation_Code], [Organisation_Name] FROM [Sponsoring_Organisation_Master]">
+                                                </asp:SqlDataSource>
+                                                </td></tr>
+                                            <tr>
+                                                <td align="left">
+                                                    <asp:Label ID="lbl_employee_id" runat="server" meta:resourcekey="lbl_employee_id"></asp:Label>
+                                                </td>
+                                                <td style="width: 87px; height: 16px" align="left">
+                                                    <asp:TextBox ID="txt_employee_id" runat="server" Width="336px" MaxLength="12"></asp:TextBox>
+                                                    <cc1:MaskedEditExtender ID="mee_employee_id" runat="server" TargetControlID="txt_employee_id"
+                                                          Mask="A{12}" Filtered="[0123456789+.,&-/  ]" PromptCharacter="">
+                                                    </cc1:MaskedEditExtender>
+                                                    <cc1:MaskedEditValidator ID="mev_employee_id" runat="server" ControlExtender="mee_employee_id"
+                                                          ControlToValidate="txt_employee_id" EmptyValueMessage="Employee ID must be entered"
+                                                          IsValidEmpty="false" Display="None"></cc1:MaskedEditValidator>
+                                                    <cc1:ValidatorCalloutExtender ID="vce_employee_id" runat="server" TargetControlID="mev_employee_id">
+                                                    </cc1:ValidatorCalloutExtender>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td align="left">
+                                                    <asp:Label ID="lbl_candidate_name" runat="server" meta:resourcekey="lbl_candidate_name"></asp:Label>
+                                                </td>
+                                                <td style="width: 87px; height: 16px" align="left">
+                                                    <asp:TextBox ID="txt_candidate_name" runat="server" Width="336px" MaxLength="100"></asp:TextBox>
+                                                    <cc1:MaskedEditExtender ID="mee_candidate_name" runat="server" TargetControlID="txt_candidate_name"
+                                                          Mask="LA{99}" Filtered="[0123456789+.,&-/  ]" PromptCharacter="">
+                                                    </cc1:MaskedEditExtender>
+                                                    <cc1:MaskedEditValidator ID="mev_candidate_name" runat="server" ControlExtender="mee_candidate_name"
+                                                          ControlToValidate="txt_candidate_name" EmptyValueMessage="Candidate Name must be entered"
+                                                          IsValidEmpty="false" Display="None"></cc1:MaskedEditValidator>
+                                                    <cc1:ValidatorCalloutExtender ID="vce_candidate_name" runat="server" TargetControlID="mev_candidate_name">
+                                                    </cc1:ValidatorCalloutExtender>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td align="left">
+                                                    <asp:Label ID="lbl_sex_code" runat="server" meta:resourcekey="lbl_sex_code"></asp:Label>
+                                                </td>
+                                                <td style="width: 87px; height: 16px" align="left">
+                                                 
+                                                    <asp:DropDownList ID="ddl_gender_code" runat="server" TabIndex="9" >
+                                            <asp:ListItem Value="X" >Select Gender </asp:ListItem>
+                                            <asp:ListItem Value="M" >Male</asp:ListItem>
+                                            <asp:ListItem Value="F" >Female</asp:ListItem>
+                                        </asp:DropDownList>
+                                        
+                                        <asp:RegularExpressionValidator ID="rev_gender_code" runat="server" ControlToValidate="ddl_gender_code"
+                                            SetFocusOnError="True" ErrorMessage="Please Select Gender Code" 
+                                            ValidationExpression="M|F" ></asp:RegularExpressionValidator>
+                                                    <%--<asp:TextBox ID="txt_sex_code" runat="server" Width="336px" MaxLength="1"></asp:TextBox>
+                                                    <cc1:MaskedEditExtender ID="mee_sex_code" runat="server" TargetControlID="txt_sex_code"
+                                                          Mask="LA{0}" Filtered="[0123456789+.,&-/  ]" PromptCharacter="">
+                                                    </cc1:MaskedEditExtender>
+                                                    <cc1:MaskedEditValidator ID="mev_sex_code" runat="server" ControlExtender="mee_sex_code"
+                                                          ControlToValidate="txt_sex_code" EmptyValueMessage="Sex Code must be entered"
+                                                          IsValidEmpty="false" Display="None"></cc1:MaskedEditValidator>
+                                                    <cc1:ValidatorCalloutExtender ID="vce_sex_code" runat="server" TargetControlID="mev_sex_code">
+                                                    </cc1:ValidatorCalloutExtender>--%>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td align="left">
+                                                    <asp:Label ID="lbl_designation_code" runat="server" meta:resourcekey="lbl_designation_code"></asp:Label>
+                                                </td>
+                                                <td style="width: 87px; height: 16px" align="left">
+                                                    <%--<asp:TextBox ID="txt_designation_code" runat="server" Width="336px" MaxLength="10"></asp:TextBox>
+                                                    <cc1:MaskedEditExtender ID="mee_designation_code" runat="server" TargetControlID="txt_designation_code"
+                                                          Mask="9999999999" PromptCharacter="">
+                                                    </cc1:MaskedEditExtender>
+                                                    <cc1:MaskedEditValidator ID="mev_designation_code" runat="server" ControlExtender="mee_designation_code"
+                                                          ControlToValidate="txt_designation_code" EmptyValueMessage="Designation Code must be entered"
+                                                          IsValidEmpty="false" Display="None"></cc1:MaskedEditValidator>
+                                                    <cc1:ValidatorCalloutExtender ID="vce_designation_code" runat="server" TargetControlID="mev_designation_code">
+                                                    </cc1:ValidatorCalloutExtender>--%><asp:DropDownList ID="ddl_Designation" runat="server" AppendDataBoundItems="True"
+                                            DataSourceID="SqlDataDesignation" DataTextField="Description" DataValueField="Designation_Code"
+                                            TabIndex="5" Width="250px" >
+                                            <asp:ListItem >Select</asp:ListItem>
+                                        </asp:DropDownList>
+                                        <asp:RegularExpressionValidator ID="RegularExpressionValidator1" runat="server" ControlToValidate="ddl_Designation"
+                                            ErrorMessage="*" SetFocusOnError="True" ValidationExpression="^[1-9[0-9][0-9]*" ></asp:RegularExpressionValidator>
+                                        <asp:SqlDataSource ID="SqlDataDesignation" runat="server" ConnectionString="<%$ ConnectionStrings:BCASConnectionString %>"
+                                            SelectCommand="SELECT [Designation_Code], [Description] FROM [Designation_Master]">
+                                        </asp:SqlDataSource>
+                                                    
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td align="left">
+                                                    <asp:Label ID="lbl_dob" runat="server" meta:resourcekey="lbl_dob"></asp:Label>
+                                                </td>
+                                                <td style="width: 87px; height: 16px" align="left">
+                                                    <asp:TextBox ID="txt_dob" runat="server" Width="336px" MaxLength="10"></asp:TextBox>
+                                                    <cc1:MaskedEditExtender ID="mee_dob" runat="server" TargetControlID="txt_dob"
+                                                          Mask="99/99/9999" MaskType = "Date" UserDateFormat="DayMonthYear" CultureName="en-GB">
+                                                    </cc1:MaskedEditExtender>
+                                                    <cc1:MaskedEditValidator ID="mev_dob" runat="server" ControlExtender="mee_dob"
+                                                          ControlToValidate="txt_dob" EmptyValueMessage="DOB must be entered"
+                                                          IsValidEmpty="false" Display="None"></cc1:MaskedEditValidator>
+                                                    <cc1:ValidatorCalloutExtender ID="vce_dob" runat="server" TargetControlID="mev_dob">
+                                                    </cc1:ValidatorCalloutExtender>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td align="left">
+                                                    <asp:Label ID="lbl_email_id" runat="server" meta:resourcekey="lbl_email_id"></asp:Label>
+                                                </td>
+                                                <td style="width: 87px; height: 16px" align="left">
+                                                    <asp:TextBox ID="txt_email_id" runat="server" Width="336px" MaxLength="50"></asp:TextBox>
+                                                    <cc1:MaskedEditExtender ID="mee_email_id" runat="server" TargetControlID="txt_email_id"
+                                                          Mask="LA{49}" Filtered="[0123456789+.,&-/@]" PromptCharacter="">
+                                                    </cc1:MaskedEditExtender>
+                                                    <cc1:MaskedEditValidator ID="mev_email_id" runat="server" ControlExtender="mee_email_id"
+                                                          ControlToValidate="txt_email_id" EmptyValueMessage="Email Id must be entered"
+                                                          IsValidEmpty="false" Display="None"></cc1:MaskedEditValidator>
+                                                    <cc1:ValidatorCalloutExtender ID="vce_email_id" runat="server" TargetControlID="mev_email_id">
+                                                    </cc1:ValidatorCalloutExtender>
+                                                    
+                                                    <asp:RequiredFieldValidator ID="rfv_email_id" runat="server" ControlToValidate="txt_email_id"
+                                                             SetFocusOnError="true"  ErrorMessage="Please Enter Valid Email Id"></asp:RequiredFieldValidator>
+                                                        <asp:RegularExpressionValidator ID="rev_email_id" runat="server" ControlToValidate="txt_email_id"
+                                                             SetFocusOnError="true"  ErrorMessage="Please Enter Valid Email Id" ValidationExpression="\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*"></asp:RegularExpressionValidator>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td align="left">
+                                                    <asp:Label ID="lbl_mobile_no" runat="server" meta:resourcekey="lbl_mobile_no"></asp:Label>
+                                                </td>
+                                                <td style="width: 87px; height: 16px" align="left">
+                                                    <asp:TextBox ID="txt_mobile_no" runat="server" Width="336px" MaxLength="10"></asp:TextBox>
+                                                    <cc1:MaskedEditExtender ID="mee_mobile_no" runat="server" TargetControlID="txt_mobile_no"
+                                                          Mask="9999999999" Filtered="[0123456789+.,&-/  ]" PromptCharacter="">
+                                                    </cc1:MaskedEditExtender>
+                                                    <cc1:MaskedEditValidator ID="mev_mobile_no" runat="server" ControlExtender="mee_mobile_no"
+                                                          ControlToValidate="txt_mobile_no" EmptyValueMessage="Mobile No must be entered"
+                                                          IsValidEmpty="false" Display="None"></cc1:MaskedEditValidator>
+                                                    <cc1:ValidatorCalloutExtender ID="vce_mobile_no" runat="server" TargetControlID="mev_mobile_no">
+                                                    </cc1:ValidatorCalloutExtender>
+                                                    
+                                                    <asp:RegularExpressionValidator ID="rev_mobile_no" runat="server" ControlToValidate="txt_mobile_no"
+                                                             SetFocusOnError="true"  ErrorMessage="Please Enter Valid Mobile No." ValidationExpression="^[1-9][0-9]{9}"></asp:RegularExpressionValidator>
+                                                    
+                                                    
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td align="left">
+                                                    <asp:Label ID="lbl_nationality_code" runat="server" meta:resourcekey="lbl_nationality_code"></asp:Label>
+                                                </td>
+                                                <td style="width: 87px; height: 16px" align="left">
+                                                <asp:DropDownList ID="ddl_Nationality" runat="server" AppendDataBoundItems="True"
+                                            DataSourceID="SqlDataNationality" DataTextField="Country_Name" DataValueField="Country_Code"
+                                            TabIndex="12" Width="250px" >
+                                            <asp:ListItem >Select</asp:ListItem>
+                                        </asp:DropDownList>
+                                        <asp:RegularExpressionValidator ID="RegularExpressionValidator2" runat="server" ControlToValidate="ddl_Nationality"
+                                            ErrorMessage="*" SetFocusOnError="True" ValidationExpression="^[1-9[0-9][0-9]*"></asp:RegularExpressionValidator>
+                                        <asp:SqlDataSource ID="SqlDataNationality" runat="server" ConnectionString="<%$ ConnectionStrings:BCASConnectionString %>"
+                                            
+                                            SelectCommand="SELECT [Country_Code], [Country_Name] FROM [Country_Master]">
+                                        </asp:SqlDataSource>
+                                                    <%--<asp:TextBox ID="txt_nationality_code" runat="server" Width="336px" MaxLength="10"></asp:TextBox>
+                                                    <cc1:MaskedEditExtender ID="mee_nationality_code" runat="server" TargetControlID="txt_nationality_code"
+                                                          Mask="9999999999" PromptCharacter="">
+                                                    </cc1:MaskedEditExtender>
+                                                    <cc1:MaskedEditValidator ID="mev_nationality_code" runat="server" ControlExtender="mee_nationality_code"
+                                                          ControlToValidate="txt_nationality_code" EmptyValueMessage="Nationality Code must be entered"
+                                                          IsValidEmpty="false" Display="None"></cc1:MaskedEditValidator>
+                                                    <cc1:ValidatorCalloutExtender ID="vce_nationality_code" runat="server" TargetControlID="mev_nationality_code">
+                                                    </cc1:ValidatorCalloutExtender>--%>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td align="left">
+                                                    <asp:Label ID="lbl_educational_qualification_code" runat="server" meta:resourcekey="lbl_educational_qualification_code"></asp:Label>
+                                                </td>
+                                                <td style="width: 87px; height: 16px" align="left">
+                                                    <%--<asp:TextBox ID="txt_educational_qualification_code" runat="server" Width="336px" MaxLength="10"></asp:TextBox>
+                                                    <cc1:MaskedEditExtender ID="mee_educational_qualification_code" runat="server" TargetControlID="txt_educational_qualification_code"
+                                                          Mask="9999999999" PromptCharacter="">
+                                                    </cc1:MaskedEditExtender>
+                                                    <cc1:MaskedEditValidator ID="mev_educational_qualification_code" runat="server" ControlExtender="mee_educational_qualification_code"
+                                                          ControlToValidate="txt_educational_qualification_code" EmptyValueMessage="Educational Qualification Code must be entered"
+                                                          IsValidEmpty="false" Display="None"></cc1:MaskedEditValidator>
+                                                    <cc1:ValidatorCalloutExtender ID="vce_educational_qualification_code" runat="server" TargetControlID="mev_educational_qualification_code">
+                                                    </cc1:ValidatorCalloutExtender>--%>
+                                                    
+                                                    <asp:DropDownList ID="ddl_Qualification" runat="server" AppendDataBoundItems="True"
+                                            DataSourceID="SqlDataQualification" DataTextField="Description" DataValueField="Qualification_Code"
+                                            TabIndex="19" Width="250px">
+                                            <asp:ListItem>Select</asp:ListItem>
+                                        </asp:DropDownList>
+                                        <asp:RegularExpressionValidator ID="RegularExpressionValidator3" runat="server" ControlToValidate="ddl_Qualification"
+                                            ErrorMessage="*" SetFocusOnError="True" ValidationExpression="^[1-9[0-9][0-9]*"></asp:RegularExpressionValidator>
+                                        
+                                        <asp:SqlDataSource ID="SqlDataQualification" runat="server" ConnectionString="<%$ ConnectionStrings:BCASConnectionString %>"
+                                            SelectCommand="SELECT [Qualification_Code], [Description] FROM [Qualification_Master]">
+                                        </asp:SqlDataSource> 
+                                                    
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td align="left">
+                                                    <asp:Label ID="lbl_registration_number" runat="server" meta:resourcekey="lbl_registration_number"></asp:Label>
+                                                </td>
+                                                <td style="width: 87px; height: 16px" align="left">
+                                                    <asp:TextBox ID="txt_registration_number" runat="server" Width="336px" MaxLength="10" Enabled="False" ></asp:TextBox>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </asp:Panel>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="height: 20px;" align="center">
+                                    <table>
+                                        <tr>
+                                            <td style="height: 26px">
+                                                <asp:Button ID="btn_insert" runat="server" EnableTheming="False" meta:resourcekey="btn_insert"
+                                                    OnClick="btn_insert_Click" CausesValidation="false" AccessKey="I" 
+                                                    Visible="False" />
+                                            </td>
+                                            <td style="height: 26px">
+                                                <asp:Button ID="btn_update" runat="server" EnableTheming="False" meta:resourcekey="btn_update"
+                                                    OnClick="btn_update_Click" CausesValidation="false" Enabled="false" AccessKey="U" />
+                                            </td>
+                                            <td style="height: 26px">
+                                                <asp:Button ID="btn_search" runat="server" EnableTheming="False" meta:resourcekey="btn_search"
+                                                    CausesValidation="false" Enabled="false" OnClick="btn_search_Click" AccessKey="S" />
+                                            </td>
+                                            <td style="height: 26px">
+                                                <asp:Button ID="btn_save" runat="server" EnableTheming="False" meta:resourcekey="btn_save"
+                                                    OnClick="btn_save_Click" CausesValidation="true" AccessKey="V" />
+                                            </td>
+                                            <td style="height: 26px">
+                                                <asp:Button ID="btn_quit" runat="server" EnableTheming="False" meta:resourcekey="btn_quit"
+                                                    OnClick="btn_quit_Click" CausesValidation="false" AccessKey="Q" 
+                                                    Visible="False" />
+                                            </td>
+                                            <td style="height: 26px">
+                                                <asp:Button ID="btn_cancel" runat="server" EnableTheming="False" meta:resourcekey="btn_cancel"
+                                                    OnClick="btn_cancel_Click" CausesValidation="False" AccessKey="C" />
+                                            </td>
+                                            <td style="height: 26px">
+                                                <asp:Button ID="btn_display" runat="server" EnableTheming="False" meta:resourcekey="btn_display"
+                                                    OnClick="btn_display_Click" CausesValidation="False" AccessKey="D" />
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <asp:Label ID="lbl_choice" runat="server" Visible="False"></asp:Label>
+                                    <asp:Label ID="lbl_error" runat="server"></asp:Label>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <table>
+                                        <thead>
+                                            <asp:Label ID="lbl_errors" runat="server" Font-Bold="true" meta:resourcekey="lbl_errors"
+                                                Visible="false"></asp:Label>
+                                        </thead>
+                                        <tr>
+                                            <td style="height: 28px; width: auto;">
+                                                <asp:BulletedList ID="bullet_errors" runat="server" BulletStyle="Numbered">
+                                                </asp:BulletedList>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    </ContentTemplate>
+                </asp:UpdatePanel>
+            </td>
+        </tr>
+        <tr align="center" >
+            <td align="center">
+                <asp:UpdatePanel ID="UpdatePanel2" runat="server">
+                    <ContentTemplate>
+                        <table style="width: auto; height: 96px" align="center">
+                            <tr align="center">
+                                <td>
+                                    <asp:Panel ID="grd_panel" runat="server" BorderColor="#DEBA84" BorderWidth="1px">
+                                    <div id=div1 style="overflow:scroll;height:250px;width: 900px" >
+                                        <asp:GridView ID="GridView1" runat="server" AllowPaging="True" BackColor="#DEBA84"
+                                            BorderColor="#DEBA84" BorderStyle="None" BorderWidth="1px" CellPadding="3" CellSpacing="2"
+                                            DataSourceID="ObjectDataSource1" PageSize="5" Height="50%" OnSelectedIndexChanged="GridView1_SelectedIndexChanged"
+                                            OnRowDataBound="GridView1_RowDataBound">
+                                            <FooterStyle BackColor="#F7DFB5" ForeColor="#8C4510" />
+                                            <RowStyle BackColor="#FFF7E7" ForeColor="#8C4510" HorizontalAlign="Center" Wrap="False" />
+                                            <SelectedRowStyle BackColor="#738A9C" Font-Bold="True" ForeColor="White" />
+                                            <Columns>
+                                                <asp:CommandField ShowSelectButton="True" />
+                                            </Columns>
+                                            <PagerStyle ForeColor="#8C4510" HorizontalAlign="Left" />
+                                            <HeaderStyle BackColor="#A55129" Font-Bold="True" ForeColor="White" />
+                                        </asp:GridView>
+                                        </div>
+                                        <asp:ObjectDataSource ID="ObjectDataSource1" runat="server" SelectMethod="GetCandidate_Registration_Relieved"
+                                            TypeName="BCASClassLibrary.TYP_CANDIDATE_REGISTRATION">
+                                            <SelectParameters>
+                                                <asp:Parameter Name="pOrganisation_Code" Type="Int32" DefaultValue="-1" />
+                                                <asp:Parameter Name="pEmployee_ID" Type="String" DefaultValue="*" />
+                                                <asp:Parameter Name="pCandidate_Name" Type="String" DefaultValue="*" />
+                                                <asp:Parameter Name="pSex_Code" Type="String" DefaultValue="*" />
+                                                <asp:Parameter Name="pDesignation_Code" Type="Int32" DefaultValue="-1" />
+                                                <asp:Parameter Name="pDOB" Type="String" DefaultValue="01/01/1900" />
+                                                <asp:Parameter Name="pEmail_Id" Type="String" DefaultValue="*" />
+                                                <asp:Parameter Name="pMobile_No" Type="String" DefaultValue="*" />
+                                                <asp:Parameter Name="pNationality_Code" Type="Int32" DefaultValue="-1" />
+                                                <asp:Parameter Name="pEducational_Qualification_Code" Type="Int32" DefaultValue="-1" />
+                                                <asp:Parameter Name="pRegistration_Number" Type="Int32" DefaultValue="1" />
+                                            </SelectParameters>
+                                        </asp:ObjectDataSource>
+                                    </asp:Panel>
+                                </td>
+                            </tr>
+                        </table>
+                    </ContentTemplate>
+                    <Triggers>
+                        <asp:AsyncPostBackTrigger ControlID="btn_save" EventName="Click" />
+                        <asp:AsyncPostBackTrigger ControlID="btn_display" EventName="Click" />
+                    </Triggers>
+                </asp:UpdatePanel>
+            </td>
+        </tr>
+    </table>
+</asp:Content>
+
+
