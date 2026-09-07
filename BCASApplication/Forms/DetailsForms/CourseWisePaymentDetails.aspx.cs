@@ -8,11 +8,13 @@ using System.Web;
 using System.Web.Security;
 using System.Web.UI.WebControls;
 using BCASClassLibrary;
+using System.Web.UI;
 
 public partial class Forms_DetailsForms_CourseWisePaymentDetails : System.Web.UI.Page
 {
     private const string PaymentDetailsViewStateKey = "CourseWisePaymentDetails";
     private readonly TYP_PayeeOrganisationPayment objPay = new TYP_PayeeOrganisationPayment();
+    private bool _exportingExcel = false;  
 
     protected void Page_Load(object sender, EventArgs e)
     {
@@ -27,6 +29,16 @@ public partial class Forms_DetailsForms_CourseWisePaymentDetails : System.Web.UI
             grdPaymentDetails.Visible = false;
             pnlReceipt.Visible = false;
         }
+    }
+
+    protected override void Render(HtmlTextWriter writer)
+    {
+        if (_exportingExcel)
+        {
+            return;
+        }
+
+        base.Render(writer);
     }
 
     protected void btnSearch_Click(object sender, EventArgs e)
@@ -352,7 +364,8 @@ ORDER BY Course_Schedule.Schedule_ID DESC", con))
         Response.ContentType = "application/vnd.ms-excel";
         Response.AppendHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
         Response.Write(content.ToString());
-        Response.Flush();
+        //Response.Flush();
+        _exportingExcel = true;
         HttpContext.Current.ApplicationInstance.CompleteRequest();
     }
 
