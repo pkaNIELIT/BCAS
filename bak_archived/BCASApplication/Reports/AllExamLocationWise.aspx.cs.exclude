@@ -1,0 +1,125 @@
+﻿using System;
+using System.Collections;
+using System.Configuration;
+using System.Data;
+using System.Linq;
+using System.Web;
+using System.Web.Security;
+using System.Web.UI;
+using System.Web.UI.HtmlControls;
+using System.Web.UI.WebControls;
+using System.Web.UI.WebControls.WebParts;
+using System.Xml.Linq;
+using System.Data.SqlClient;
+using BCASClassLibrary;
+
+public partial class AllExamLocationWise : System.Web.UI.Page
+{
+    TYP_BCAS_Approval objBCAS = new TYP_BCAS_Approval();
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        ReportViewer1.Visible = false;
+
+        if (!IsPostBack)
+        {
+
+            if ((Convert.ToString(HttpContext.Current.Session["UserId"]).Trim().Length == 0))
+            {
+                HttpContext.Current.Response.Redirect("~/Home.aspx");
+            }
+           
+                lblHeading.Text = "BCAS Report";
+
+            }
+
+        }
+
+   
+   private DataSet GetAllExamLocation(String spname,SqlParameter p)
+    {
+        string ConnectionString = ConfigurationManager.ConnectionStrings["BCASConnectionString"].ConnectionString;
+       using (SqlConnection con = new SqlConnection(ConnectionString))
+            {
+           con.Open();
+           using (SqlDataAdapter sda = new SqlDataAdapter(spname, con))
+           {
+               sda.SelectCommand.CommandType = CommandType.StoredProcedure;
+               sda.SelectCommand.Parameters.Add(p);
+               DataSet ds = new DataSet();
+               sda.Fill(ds);
+               return ds;
+           }
+
+           }
+    }
+    protected void btnDisplay_Click(object sender, EventArgs e)
+    {
+        if (Page.IsValid)
+        {
+            //ReportViewer1.ServerReport.ReportServerUrl = new System.Uri("http://172.25.5.7/ReportServer");
+            string url = "https://" + ConfigurationManager.AppSettings["ReportServerHost"].ToString();
+            ReportViewer1.ServerReport.ReportServerUrl = new System.Uri(url);
+            ReportViewer1.ServerReport.ReportServerCredentials = new ReportCredentials(ConfigurationManager.AppSettings["ReportServerUser"].ToString(), ConfigurationManager.AppSettings["ReportServerPass"].ToString(), "DOEACCHQ");
+            ReportViewer1.ServerReport.ReportPath = "/BCAS_Reports/ExamLocationWiseReport_All";
+
+            Microsoft.Reporting.WebForms.ReportParameter[] Param = new Microsoft.Reporting.WebForms.ReportParameter[3];
+
+            Param[0] = new Microsoft.Reporting.WebForms.ReportParameter("Schedule", ddlSchedule.SelectedValue);
+            Param[1] = new Microsoft.Reporting.WebForms.ReportParameter("examlocationcode", ddlExamLocation.SelectedValue);
+            Param[2] = new Microsoft.Reporting.WebForms.ReportParameter("approval", ddlapproval.SelectedValue);
+
+            ReportViewer1.ShowCredentialPrompts = false;
+            ReportViewer1.ServerReport.SetParameters(Param);
+            ReportViewer1.Visible = true;
+            this.ReportViewer1.LocalReport.Refresh();
+        }
+
+    }
+
+    public class ReportCredentials : Microsoft.Reporting.WebForms.IReportServerCredentials
+    {
+        string _userName, _password, _domain;
+
+        public ReportCredentials(string userName, string password, string domain)
+        {
+            _userName = userName;
+            _password = password;
+            _domain = domain;
+        }
+        public System.Security.Principal.WindowsIdentity ImpersonationUser
+        {
+            get
+            {
+                return null;
+            }
+        }
+        public System.Net.ICredentials NetworkCredentials
+        {
+            get
+            {
+                return new System.Net.NetworkCredential(_userName, _password, _domain);
+            }
+        }
+        public bool GetFormsCredentials(out System.Net.Cookie authCoki, out string userName,
+            out string password, out string authority)
+        {
+            userName = _userName;
+            password = _password;
+            authority = _domain;
+            authCoki = new System.Net.Cookie(".ASPXAUTH", ".ASPXAUTH", "/", "Domain");
+            return true;
+        }
+
+    }
+    protected void ddlSchedule_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        ddlExamLocation.Items.Clear();
+        ddlExamLocation.Items.Add(new ListItem ("Select Exam Location","0"));
+        ddlExamLocation.Items.Add(new ListItem ("All Exam Location","999999"));
+        ddlExamLocation.AppendDataBoundItems=true;
+        SqlParameter p=new SqlParameter("@Schedule",ddlSchedule.SelectedValue);
+        DataSet ds = GetAllExamLocation("GetAllExamLocationName",p);
+        ddlExamLocation.DataSource=ds;
+        ddlExamLocation.DataBind();
+    }
+}

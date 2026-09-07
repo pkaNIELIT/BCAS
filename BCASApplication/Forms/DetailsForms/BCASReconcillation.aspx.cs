@@ -1,0 +1,358 @@
+﻿using System;
+using System.Collections;
+using System.Configuration;
+using System.Data;
+using System.IO;
+using System.Web;
+using System.Web.Security;
+using System.Web.UI;
+using System.Web.UI.HtmlControls;
+using System.Web.UI.WebControls;
+using System.Web.UI.WebControls.WebParts;
+using System.Threading;
+using BCASClassLibrary;
+//using System.Transactions;
+using System.Data.SqlClient;
+using System.Text;
+using System.Net;
+using System.Data.OleDb;
+using System.Text.RegularExpressions;
+
+public partial class Forms_DetailsForms_BCASReconcillation : System.Web.UI.Page
+{
+    Int32 refundValidateRecordCount = 0;
+    String BankReferenceNo = "";
+    String RefundfileName;
+    String txtFilePath;
+    String TransactionDate = "";
+    FileStream stream = null;
+    StreamWriter writer = null;
+    StringBuilder appIdList = new StringBuilder();
+    StringBuilder appIdList1 = new StringBuilder();
+    StringBuilder appIdList2 = new StringBuilder();
+    StringBuilder appIdList3 = new StringBuilder();
+    StringBuilder appIdList4 = new StringBuilder();
+    StringBuilder appIdList5 = new StringBuilder();
+    int NotValidateRecords = 0;
+    TYP_BCAS_Approval objBCAS = new TYP_BCAS_Approval();
+  
+    protected void Page_Load(object sender, EventArgs e)
+    {
+       
+        if (!IsPostBack)
+        {
+            if ((Convert.ToString(HttpContext.Current.Session["UserId"]).Trim().Length == 0))
+            {
+                HttpContext.Current.Response.Redirect("~/Home.aspx");
+            }
+            
+        }
+        
+
+    }    
+    
+    private void ShowMessage(int count)
+    {
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.Append("<script type = 'text/javascript'>");
+
+        sb.Append("alert('");
+
+        sb.Append(count.ToString());
+
+        sb.Append(" records Updated.');");
+
+        sb.Append("</script>");
+
+        ClientScript.RegisterStartupScript(this.GetType(),
+
+                        "script", sb.ToString());
+
+    }
+    private void ShowAlertMessage(string msg)
+    {
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.Append("<script type = 'text/javascript'>");
+
+        sb.Append("alert('");
+
+        sb.Append(msg);        
+
+        sb.Append("</script>");
+
+        ClientScript.RegisterStartupScript(this.GetType(),
+
+                        "script", sb.ToString());
+
+    }    
+    private void BindGrid()
+    {
+                
+        int scheduleID, Organisation;
+
+       
+
+        gvAll.Visible = true;
+
+        //using (DataTable dt = objBCAS.getBCASApporvedCandidates())
+        //{
+            
+        //    gvAll.DataSource = dt;
+        //    gvAll.DataBind();
+            
+        //}
+
+
+    }
+    protected void btnCancel_Click(object sender, EventArgs e)
+    {
+        try
+        {
+           
+            divValidateData.Visible = false;
+        }
+        catch (Exception ex)
+        {
+            //ShowAlert(ex.Message);
+        }
+    }
+    protected void OnPaging(object sender, GridViewPageEventArgs e)
+    {
+
+        gvAll.PageIndex = e.NewPageIndex;        
+        BindGrid();       
+      
+    }
+
+
+    protected void btnUploadData_Click(object sender, EventArgs e)
+    {
+        try
+        {
+            lblerror.Text = "";
+                    
+            StringBuilder FaildRecords = new StringBuilder();
+            FaildRecords.Append("Failed TransactionIDs:-");
+            int failedRecordCount = 0;
+            int ValidateRecords = 0;
+            int TotalRecords = 0;
+            
+            SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["BCASConnectionString"].ConnectionString);
+           
+            string filepath = Server.MapPath("~/UploadReconcillation");          
+            string filename = DateTime.Now.ToString("yyyyMMddHHmmss") + "_" + flUpload.FileName;
+            flUpload.SaveAs(filepath + "/" + filename);
+            string path = (filepath + "/" + filename);
+            string ext = System.IO.Path.GetExtension(this.flUpload.PostedFile.FileName);
+            string sExcelConnectionString = "";
+            if (ext.ToUpper() == ".XLS")
+                sExcelConnectionString = string.Format("Provider=Microsoft.Jet.OLEDB.4.0; data source={0}; Extended Properties=\"Excel 8.0;HDR=No;IMEX=1\";", path);
+            else if (ext.ToUpper() == ".XLSX")
+                sExcelConnectionString = string.Format("Provider=Microsoft.ACE.OLEDB.12.0;Data Source={0};Extended Properties=\"Excel 12.0 Xml;HDR=No;IMEX=1\";", path);
+            else
+            {
+                lblerror.Text="Please Choose ..XLS/.XLSX Excel File.";
+                return;
+            }
+            RefundfileName = "NIELIT_Refund_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".txt";
+            hffilename.Value = RefundfileName;
+            txtFilePath = Server.MapPath("~/UploadReconcillation/" + RefundfileName);
+            hffilepath.Value = txtFilePath;
+            if (System.IO.File.Exists(txtFilePath))
+                System.IO.File.Delete(txtFilePath);
+            System.IO.File.Copy(Server.MapPath("~/UploadReconcillation/Settlement.txt"), txtFilePath);
+            stream = new FileStream(txtFilePath, FileMode.Open, FileAccess.ReadWrite);
+            writer = new StreamWriter(stream);
+
+            OleDbConnection connection = new OleDbConnection();
+            connection.ConnectionString = sExcelConnectionString;
+            connection.Open();
+          
+            string SheetName = "";
+            DataTable Sheets = connection.GetOleDbSchemaTable(OleDbSchemaGuid.Tables, null);
+            foreach (DataRow dr1 in Sheets.Rows)
+            {
+                if (SheetName == "")
+                {
+                    SheetName = dr1[2].ToString().Replace("'", "");
+                }
+            }
+            if (SheetName != "PaymentRecords$")
+            {
+                divValidateData.Visible = false;
+                Page.ClientScript.RegisterClientScriptBlock(typeof(Page), "Alert", "alert('Please upload only Downloaded excel file!')", true);
+                return;
+            }
+            OleDbCommand command = new OleDbCommand("select * from [PaymentRecords$]", connection);          
+            OleDbDataReader dr = command.ExecuteReader();
+            Int64 transid = 0;
+            Double Amount = 0;
+            int Records = 0;
+            string RefNo = "";
+            try
+            {
+                    while (dr.Read())
+                    {
+                        string transid2 = dr[5].ToString();
+                        if (dr[5].ToString() != "")
+                        {
+                            if (dr[5].ToString() != "BD Ref No")
+                            {
+                            //Added for unique transid 
+                            string trans = dr[7].ToString();
+                            if (trans.Contains("-"))
+                            {
+                                trans = trans.Substring(9);
+                                transid = Convert.ToInt64(trans);// TRANSACTION ID
+
+                            }
+                            else
+                                transid = Convert.ToInt64(trans);// TRANSACTION ID
+                            ///////////
+                            RefNo = dr[5].ToString(); //RefNo ref 1 column
+                                Amount = Convert.ToDouble(dr[17]);
+                                TotalRecords = TotalRecords + 1; // total record
+                            } 
+                            else
+                            {
+                                continue;
+                            }
+
+                            //using (TransactionScope scope = new TransactionScope())
+                            //{
+                                string constr = ConfigurationManager.ConnectionStrings["BCASConnectionString"].ConnectionString;
+                                using (SqlConnection Conn = new SqlConnection(constr))
+                                {
+                                    using (SqlCommand cmd = new SqlCommand("UpdateCandidatesPaymentStatus", Conn))
+                                    {
+                                        Conn.Open();
+                                        cmd.CommandType = CommandType.StoredProcedure; 
+
+                                        cmd.Parameters.AddWithValue("@TransactionID", Convert.ToInt64(transid));
+                                        cmd.Parameters.AddWithValue("@Filename", filename);
+                                        cmd.Parameters.Add("@Responses", SqlDbType.VarChar, 100);
+                                        cmd.Parameters["@Responses"].Direction = ParameterDirection.Output;
+                                        cmd.Parameters.Add("@DOP", SqlDbType.Date);
+                                        cmd.Parameters["@DOP"].Direction = ParameterDirection.Output;
+                                        cmd.Parameters.Add("@Is_Settled", SqlDbType.Int);
+                                        cmd.Parameters["@Is_Settled"].Direction = ParameterDirection.Output;
+
+                                        Records = cmd.ExecuteNonQuery();
+                                        string ResponseMessage = Convert.ToString(cmd.Parameters["@Responses"].Value);
+                                        DateTime date1 = Convert.ToDateTime(cmd.Parameters["@DOP"].Value);
+                                        int IsSettle = Convert.ToInt32(cmd.Parameters["@Is_Settled"].Value);
+                                      if (Records >= 1)
+                                      {
+                                          ValidateRecords = ValidateRecords + 1;
+                                      }
+                                      else
+                                      {
+                                          if ((ResponseMessage != "Success") || (ResponseMessage == "Success" && IsSettle == 0))
+                                          {
+                                              refundValidateRecordCount = refundValidateRecordCount + 1;
+                                              //download of refund file
+                                              writer.Write(RefNo.ToString());
+                                              writer.Write(",");
+                                              string year = date1.Year.ToString();
+                                              string month = date1.Month.ToString();
+                                              string day = date1.Day.ToString();
+                                              string finaldate = year + month + day;
+                                              writer.Write(finaldate);
+                                              writer.Write(",");
+                                              writer.Write(transid.ToString());
+                                              writer.Write(",");
+                                              writer.Write(Amount.ToString());
+                                              writer.Write(",");
+                                              writer.Write(Amount.ToString());
+                                              writer.WriteLine();
+
+
+                                          }
+                                          else
+                                          {
+
+                                              FaildRecords.Append(transid.ToString() + ",");
+                                              failedRecordCount++;
+                                          }
+                                          if (failedRecordCount % 10 == 0 && failedRecordCount > 0)
+                                              FaildRecords.Append(WebUtility.HtmlDecode("<br/>"));
+                                      }
+                                    }
+                                }                               
+                           
+                                //scope.Complete();
+                            };
+                        }
+                    //}
+                    failedRecordCount = TotalRecords - ValidateRecords - refundValidateRecordCount;
+                lblTotalRecords.Text = TotalRecords.ToString();
+                lblValidateRecords.Text = ValidateRecords.ToString();
+                lblFailedRecords.Text = failedRecordCount.ToString() +WebUtility.HtmlDecode("<br/>") + FaildRecords.ToString().TrimEnd(',');
+                lblRefundRecords.Text = refundValidateRecordCount.ToString() + " <b> ( Excluding ChargeBack Transactions ) <b/> ";
+                divValidateData.Visible = true;
+                writer.Close();
+                stream.Close();
+
+                if (refundValidateRecordCount > 0)
+                    btndownload.Visible = true;
+                else
+                    btndownload.Visible = false;
+            }
+            catch (Exception ex)
+            {
+                //ShowAlert(ex.Message, true);
+            }
+            finally
+            {
+                dr.Close();
+                dr.Dispose();
+                command.Dispose();
+                connection.Close();
+                connection.Dispose();
+            }
+        }
+        catch (Exception ex)
+        {            
+        }      
+    }       
+
+    public static Boolean IsNumeric(String value)
+    {
+        try
+        {
+            Regex regex = new Regex(@"^[-+]?[0-9]*\.?[0-9]+$");
+            return regex.IsMatch(value.Trim());
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+    }
+    
+    
+   
+
+   
+    protected void btndownload_Click(object sender, EventArgs e)
+    {
+        try
+        {           
+            if (lblRefundRecords.Text != "0")
+            {
+                Response.AddHeader("content-disposition", "attachment;filename=" + hffilename.Value);
+                Response.ContentType = "text/plain";
+                Response.Charset = "UTF-8";
+                Response.WriteFile(hffilepath.Value);
+                Response.End();
+            }
+        }
+        catch (Exception ex)
+        {
+            
+        }
+    }
+}

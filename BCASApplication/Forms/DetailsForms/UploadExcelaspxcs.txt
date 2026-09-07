@@ -1,0 +1,185 @@
+using System;
+using System.Collections.Generic;
+using System.Data.Common;
+using System.Data;
+using System.Data.SqlClient;
+//using OfficeOpenXml;
+using System.Linq;
+using System.Reflection.Emit;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Configuration;
+using System.Drawing;
+using System.Xml.Linq;
+using System.Runtime.InteropServices;
+using System.IO;
+//using Microsoft.Office.Interop.Excel;
+using System.Data.OleDb;
+
+public partial class Forms_DetailsForms_UploadExcel : System.Web.UI.Page
+{
+    string strConnString = ConfigurationManager.ConnectionStrings["BCASConnectionString"].ConnectionString; // get it from Web.config file
+    SqlTransaction objTrans = null;
+
+
+    protected void Page_Load(object sender, EventArgs e)
+    {
+
+    }
+
+
+    protected void btnUpload_Click(object sender, EventArgs e)
+    {
+        try
+        {
+            lblError.Text = "";
+            string conString = string.Empty;
+            //string No, Name, Dateofbirth;
+
+            if (fileUploadExcel.HasFile)
+            {
+
+                string extension = Path.GetExtension(fileUploadExcel.FileName);
+
+                if (extension == ".xls" || extension == ".xlsx")
+                {
+                    string filePath = Server.MapPath("~/Upload/EBCASFiles/" + fileUploadExcel.FileName);
+                    fileUploadExcel.SaveAs(filePath);
+                    lblfilename.Text = fileUploadExcel.FileName;
+					
+                    switch (extension)
+                    {
+                        case ".xls": //Excel 97-03.
+                            conString = ConfigurationManager.ConnectionStrings["Excel03ConString"].ConnectionString;
+                            break;
+                        case ".xlsx": //Excel 07 and above.
+                            conString = ConfigurationManager.ConnectionStrings["Excel07ConString"].ConnectionString;
+                            break;
+                    }
+ 
+                    conString = string.Format(conString, filePath);
+                    System.Data.DataTable dt = new System.Data.DataTable();
+                    using (OleDbConnection connExcel = new OleDbConnection(conString))
+                    {
+                        using (OleDbCommand cmdExcel = new OleDbCommand())
+                        {
+                            cmdExcel.CommandTimeout = 400;
+                            using (OleDbDataAdapter odaExcel = new OleDbDataAdapter())
+                            {
+                               
+                                cmdExcel.Connection = connExcel;
+
+                                //Get the name of First Sheet.
+                                connExcel.Open();
+                                System.Data.DataTable dtExcelSchema;
+                                dtExcelSchema = connExcel.GetOleDbSchemaTable(OleDbSchemaGuid.Tables, null);
+                                string sheetName = dtExcelSchema.Rows[0]["TABLE_NAME"].ToString();
+
+                                //Added by Kismat on 25-08-2025
+                                if (sheetName != "Sheet1$") //Checking sheet name
+                                {
+                                    lblError.ForeColor = System.Drawing.Color.Red;
+                                    lblError.Text = "Please Change your Excel Sheet Name. It should be 'Sheet1' ";
+                                    return;
+                                }
+
+                                connExcel.Close();
+
+                                //Read Data from First Sheet.
+                                connExcel.Open();
+                                cmdExcel.CommandText = "SELECT * From [Sheet1$]";
+                                odaExcel.SelectCommand = cmdExcel;
+                                odaExcel.Fill(dt);
+                                connExcel.Close();
+                            }
+                        }
+                                using (var connection = new SqlConnection(ConfigurationManager.ConnectionStrings["BCASConnectionString"].ToString()))
+                                {
+                                    connection.Open();
+                                    using (var command = new SqlCommand("ExcelDataImport", connection))
+                                    //using (var command = new SqlCommand("Insert into temp([EBCASNo],[name],[Dateofbirth],[uploadedby],[uploadedOn],[uploadedFileName]) values(@EBCASNo,@name,@Dateofbirth,'1',GETDATE(),'temp')", connection))
+                                    {
+                                       // SqlTransaction trans;
+                                       // trans = connection.BeginTransaction();
+                                       // command.Transaction = trans;
+                                        command.CommandTimeout = 400;
+                                        foreach (DataRow row in dt.Rows)
+                                        {
+                                          
+                                            string No = row["BCASID"].ToString();
+                                            string Name = row["APPLICANTNAME"].ToString();
+                                            string Dateofbirth = row["DOB"].ToString();
+
+                                            command.CommandType = CommandType.StoredProcedure;
+                                            command.Parameters.Clear();
+                                            command.Parameters.AddWithValue("@EBCASNo", row["BCASID"].ToString());
+                                            command.Parameters.AddWithValue("@name", row["APPLICANTNAME"].ToString());
+                                            command.Parameters.AddWithValue("@Dateofbirth", Convert.ToDateTime (row["DOB"].ToString()));
+                                            command.Parameters.AddWithValue("@uploadedFileName", fileUploadExcel.FileName);
+                                            command.Parameters.Add ("@pRemarks",SqlDbType .VarChar ,100);
+                                            command.Parameters["@pRemarks"].Direction = ParameterDirection.Output;
+
+
+                                            command.ExecuteNonQuery();
+                                          //  trans.Commit();
+                                            string remarks = command.Parameters["@pRemarks"].Value.ToString ();
+                                            if (remarks != "")
+                                            {
+                                                lblError.Text = remarks;
+                                                lblError.Visible = true;
+                                                grdFailed.Visible = false;
+                                            }
+                                            else
+                                                lblError.Visible = false;
+
+
+                                        }
+                                    }
+
+                                    connection.Close();
+                                    connection.Open();
+                                    using (var command = new SqlCommand("ExcelDataImportCheck", connection))
+                                    //using (var command = new SqlCommand("Insert into temp([EBCASNo],[name],[Dateofbirth],[uploadedby],[uploadedOn],[uploadedFileName]) values(@EBCASNo,@name,@Dateofbirth,'1',GETDATE(),'temp')", connection))
+                                    {
+
+                                        command.CommandType = CommandType.StoredProcedure;
+                                        command.Parameters.Clear();
+                                        command.Parameters.Add("@SuccessCount", SqlDbType.Int).Direction = ParameterDirection.Output;
+                                        command.Parameters.Add("@FailureCount", SqlDbType.Int).Direction = ParameterDirection.Output;
+
+
+                                        command.ExecuteNonQuery();
+
+
+                                        SuccessLabel.Text = " Saved Records " + Convert.ToInt32(command.Parameters["@SuccessCount"].Value) + "<br/>" + " Duplicate Records " + Convert.ToInt32(command.Parameters["@FailureCount"].Value);
+
+                                        grdFailed.DataBind();
+                                        grdFailed.Visible = true;
+                                        //// Fetch the output parameters
+                                        //int successCount = Convert.ToInt32(command.Parameters["@SuccessCount"].Value);
+                                        //int failureCount = Convert.ToInt32(command.Parameters["@FailureCount"].Value);
+
+                                        //// Use the returned values
+                                        //Console.WriteLine("Success Count: " + successCount);
+                                        //Console.WriteLine("Failure Count: " + failureCount);
+                                    }
+                                }
+                            }
+                        }
+                    
+
+                    // Display a success message or perform further actions
+                }
+            }
+        
+        catch (Exception ex)
+        {
+
+            lblError.Text  = ex.Message;
+        }
+        finally
+        {
+        }
+    }
+}

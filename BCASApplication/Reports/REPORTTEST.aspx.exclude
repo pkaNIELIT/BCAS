@@ -1,0 +1,55 @@
+<%@ Page Language="C#" MasterPageFile="~/MasterPage.master" AutoEventWireup="true" CodeFile="REPORTTEST.aspx.cs" Inherits="REPORTTEST" Title="BCAS--> NominatedCandidates" culture="en-GB"%>
+
+<%@ Register Assembly="Microsoft.ReportViewer.WebForms, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"
+    Namespace="Microsoft.Reporting.WebForms" TagPrefix="rsweb" %>
+<asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
+</asp:Content>
+<asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" Runat="Server">
+    <table width="95%" align="center" >
+      <tr>
+        <td align="center">        
+               
+            <asp:Label ID="lblHeading" runat="server" Font-Bold="True" Font-Size="Large" 
+                ForeColor="#000099"></asp:Label>
+               
+        </td>       
+    </tr>
+    <tr align="center">
+        <td align="center">        
+        
+            <table width="70%" align="center" border="2">
+                                         
+                <tr align="left">
+                       
+                     <td colspan="2" align="center" width="100%">
+        
+            <asp:Button ID="btnDisplay" runat="server" Text="Get Data" Width="250px" 
+                onclick="btnDisplay_Click" TabIndex="4" />
+        
+                    </td>
+                </tr>
+            
+            </table>
+        </td>       
+    </tr>
+    
+    <tr align="center" valign="top" >
+        <td align="center" >      
+   
+             &nbsp;</td>       
+    </tr> 
+    
+    <tr align="center" valign="top" >
+        <td align="center" height="250px">      
+   
+              <rsweb:ReportViewer ID="ReportViewer1" runat="server" Height="446px" ProcessingMode="Remote" 
+            Width="100%" PromptAreaCollapsed="True" ShowCredentialPrompts="False" 
+                  DocumentMapCollapsed="True">
+        <ServerReport ReportPath ="/BCAS_Reports/Report1.rdl" ReportServerUrl="http://deep-pc/ReportServer" />
+        </rsweb:ReportViewer>             
+      
+        </td>       
+    </tr>
+    </table>
+</asp:Content>
+

@@ -1,0 +1,83 @@
+<%@ Page Language="C#" MasterPageFile="~/MasterPage.master" AutoEventWireup="true" CodeFile="OrgWiseNominationAccepted.aspx.cs" Inherits="Reports_OrgWiseNominationAccepted" Title="BCAS-->OrgWiseNominationAccepted" culture="en-GB"%>
+
+<%@ Register Assembly="Microsoft.ReportViewer.WebForms, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"
+    Namespace="Microsoft.Reporting.WebForms" TagPrefix="rsweb" %>
+
+<asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
+</asp:Content>
+<asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" Runat="Server">
+<table width="95%" align="center" >
+    <tr>
+        <td>        
+        </td>       
+    </tr>
+    <tr align="center">
+        <td>        
+               
+            <asp:Label ID="lblHeading" runat="server" Font-Bold="True" Font-Size="Large" 
+                ForeColor="#000099"></asp:Label>
+               
+        </td>       
+    </tr>
+    <tr align="center">
+        <td align="center">        
+        
+            <table width="70%" align="center" border="2">
+                <tr align="left">
+                    <td width="30%">
+            <asp:Label ID="lblCourseSchedule" runat="server" Text="Course Schedule"></asp:Label>
+                    </td>
+                     <td width="70%">
+        
+            <asp:DropDownList ID="ddlSchedule" runat="server" 
+                DataSourceID="SqlDataSource2" DataTextField="Course_Schedule" 
+                DataValueField="Schedule_ID" Width="500px" AppendDataBoundItems="True" >
+                <asp:ListItem Value="0">-Select Course Schedule-</asp:ListItem>
+            </asp:DropDownList>
+            
+            <asp:RequiredFieldValidator ID="RequiredFieldValidator1" runat="server" 
+                ErrorMessage="*" ControlToValidate ="ddlSchedule" SetFocusOnError="true" InitialValue="0" ></asp:RequiredFieldValidator>
+            
+                    </td>
+                </tr>
+            
+                <tr align="left">
+                    <td width="30%">
+         
+            
+            <asp:SqlDataSource ID="SqlDataSource2" runat="server" 
+                ConnectionString="<%$ ConnectionStrings:BCASConnectionString %>" 
+                SelectCommand="SELECT     Course_Schedule.Schedule_ID, Course_Master.Course_Name +' - Start DT '+ CONVERT(VARCHAR(10),Course_Schedule.Start_Date,103) + ' - End DT ' + CONVERT(VARCHAR(10),Course_Schedule.End_Date,103) +' - Exam DT '+  CONVERT(VARCHAR(10),Course_Schedule.Date_of_Exam,103) Course_Schedule
+FROM         Course_Master INNER JOIN
+                      Course_Schedule ON Course_Master.Course_Code = Course_Schedule.Course_Code
+                      Order By Course_Schedule.Date_of_Exam desc">
+            </asp:SqlDataSource>
+                    </td>
+                     <td width="70%">
+        
+            <asp:Button ID="btnDisplay" runat="server" Text="Get Data" Width="250px" 
+                onclick="btnDisplay_Click" TabIndex="4" />
+        
+                    </td>
+                </tr>
+            
+            </table>
+        </td>       
+    </tr>
+    <tr>
+        <td>        
+           </td>       
+    </tr>
+    <tr align="center">
+        <td align="center" Height="250px" valign="top" >      
+   
+              <rsweb:ReportViewer ID="ReportViewer1" runat="server" Height="170px" ProcessingMode="Remote" 
+            Width="100%" PromptAreaCollapsed="True" ShowCredentialPrompts="False">
+        <ServerReport ReportPath ="/BCAS_Reports/rep_NominationAccepted.rdl" ReportServerUrl="http://winserver2/ReportServer" />
+        </rsweb:ReportViewer>             
+      
+        </td>       
+    </tr>
+    </table>
+</asp:Content>
+

@@ -1,0 +1,133 @@
+/* Menu Styles for BCAS Application */
+/* Fixes horizontal menu rendering issues */
+
+/* Ensure the menu displays horizontally */
+.DynamicMenuZIndex {
+    z-index: 1000 !important;
+    position: relative;
+}
+
+/* Menu container styling */
+#Menu1 {
+    width: 100%;
+    display: block;
+}
+
+/* Static (top-level) menu items - horizontal layout */
+#Menu1 > ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+#Menu1 > ul > li {
+    display: inline-block;
+    position: relative;
+    margin: 0;
+    padding: 0;
+}
+
+#Menu1 > ul > li > a {
+    display: block;
+    padding: 5px 15px;
+    text-decoration: none;
+    color: #990000;
+    font-family: Arial Narrow, Arial, sans-serif;
+    font-size: 15px;
+}
+
+/* Static menu item hover */
+#Menu1 > ul > li > a:hover {
+    background-color: #3e9ec9;
+    color: White;
+}
+
+/* Dynamic (dropdown) menu items */
+#Menu1 ul ul {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    background-color: White;
+    border: 1px solid #6A0C23;
+    min-width: 200px;
+    z-index: 1000;
+}
+
+/* Show dropdown on hover */
+#Menu1 > ul > li:hover > ul {
+    display: block;
+}
+
+/* Dropdown menu items */
+#Menu1 ul ul li {
+    display: block;
+    border: 1px solid #6A0C23;
+    border-top: none;
+    background-color: White;
+}
+
+#Menu1 ul ul li a {
+    display: block;
+    padding: 10px;
+    text-decoration: none;
+    color: #990000;
+    font-family: Arial Narrow, Arial, sans-serif;
+    font-size: 15px;
+    background-color: White;
+}
+
+#Menu1 ul ul li a:hover {
+    background-color: #3e9ec9;
+    color: White;
+}
+
+/* Nested dropdown menus (third level) */
+#Menu1 ul ul ul {
+    left: 100%;
+    top: 0;
+}
+
+/* Fix for ASP.NET Menu control rendering */
+table.Menu1_0 {
+    border-collapse: collapse;
+    display: inline-block !important;
+}
+
+/* Ensure menu stays on one line */
+.aspNetHidden {
+    display: none !important;
+}
+
+/* ASP.NET Menu specific classes */
+.AspNet-Menu {
+    width: 100%;
+}
+
+.AspNet-Menu-Horizontal ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.AspNet-Menu-Horizontal > ul > li {
+    display: inline-block;
+    position: relative;
+}
+
+/* Additional fix for ASP.NET generated menu tables */
+#Menu1 table {
+    display: inline-table;
+    border-collapse: collapse;
+}
+
+#Menu1 td {
+    padding: 0;
+    margin: 0;
+}

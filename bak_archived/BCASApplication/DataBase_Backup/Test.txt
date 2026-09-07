@@ -1,0 +1,50 @@
+USE [bcas]
+GO
+/****** Object:  StoredProcedure [dbo].[GetPaymentBalance]    Script Date: 07/29/2013 09:28:55 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Arif Khan>
+-- Create date: <2013-07-26>
+-- Description:	<To Display Balance Amount>
+-- =============================================
+CREATE PROCEDURE [dbo].[TestProc] 
+	
+		-- Add the parameters for the stored procedure here
+		@i_Sponsoring_Organisation_Code as int,
+		@i_Payee_Organisation_Code as int			
+
+AS
+BEGIN
+declare @i_Balance_Amount as int;
+declare @i_ApplicableFee as int;
+declare @i_ApplicableST as int;
+declare @i_ApplicableFeeWithST as int;
+
+		
+		BEGIN
+			 
+			SELECT @i_Balance_Amount=Balance_Amount 
+			FROM Payment_Balances
+			WHERE Payment_Balances.Sponsoring_Organisation_Code=@i_Sponsoring_Organisation_Code 
+			AND Payment_Balances.Payee_Organisation_Code =@i_Payee_Organisation_Code 
+			
+			SELECT @i_ApplicableFee=Fee_Amount 
+			FROM Fee_Applicable
+			WHERE Fee_Applicable.End_Date is null	 
+			
+			SELECT @i_ApplicableST=Service_Tax_Applicable.Serice_Tax_Percentage  
+			FROM Service_Tax_Applicable
+			WHERE Service_Tax_Applicable.End_Date is null
+		
+		    
+		
+		
+		
+		
+		END
+		
+				
+END

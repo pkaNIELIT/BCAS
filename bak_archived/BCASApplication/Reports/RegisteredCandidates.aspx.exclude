@@ -1,0 +1,58 @@
+<%@ Page Language="C#" MasterPageFile="~/MasterPage.master" AutoEventWireup="true" CodeFile="RegisteredCandidates.aspx.cs" Inherits="Reports_RegisteredCandidates" Title="BCAS-->RegisteredCandidates" %>
+<%@ Register Assembly="Microsoft.ReportViewer.WebForms, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"
+    Namespace="Microsoft.Reporting.WebForms" TagPrefix="rsweb" %>
+
+
+<asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
+</asp:Content>
+<asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" Runat="Server">
+<table width="95%" align="center" >
+    <tr align="center">
+        <td>     
+               
+           </td>
+        
+    </tr>
+   
+    <tr align="center">
+        <td>     
+               
+            &nbsp;</td>
+        
+    </tr>
+   
+    <tr align="center">
+        <td>     
+               
+            <asp:Label ID="lblHeading" runat="server" Font-Bold="True" Font-Size="Large" 
+                ForeColor="#000099"></asp:Label>
+               
+        </td>
+        
+    </tr>
+   
+    <tr>
+        <td>     
+               
+            &nbsp;</td>
+        
+    </tr>
+   
+   
+    <tr id="R1" runat="server" align="center" Height="250px">
+        <td align="center">     
+   
+              <rsweb:ReportViewer ID="ReportViewer1" runat="server" Height="180px" ProcessingMode="Remote" 
+            Width="100%" PromptAreaCollapsed="True" >
+        <ServerReport ReportPath ="/BCAS_Reports/Rep_RegisteredCandiadtes.rdl" ReportServerUrl="" />
+        </rsweb:ReportViewer>
+             
+      
+            </td>
+        
+    </tr>
+  
+   
+</table>
+</asp:Content>
+
