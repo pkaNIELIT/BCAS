@@ -331,40 +331,44 @@ ORDER BY Course_Schedule.Schedule_ID DESC", con))
 
         StringBuilder content = new StringBuilder();
         int index;
+        content.Append("<html><head><meta http-equiv='Content-Type' content='text/html; charset=utf-8' /></head><body>");
+        content.Append("<table border='1'>");
+        content.Append("<tr>");
         for (index = 0; index < headers.Length; index++)
         {
-            content.Append(headers[index]);
-            if (index < headers.Length - 1)
-            {
-                content.Append('\t');
-            }
+            content.Append("<th>");
+            content.Append(HttpUtility.HtmlEncode(headers[index]));
+            content.Append("</th>");
         }
 
-        content.AppendLine();
+        content.Append("</tr>");
 
         foreach (DataRow row in paymentDetails.Rows)
         {
+            content.Append("<tr>");
             for (index = 0; index < columns.Length; index++)
             {
+                content.Append("<td style='mso-number-format:\"\\@\";'>");
                 content.Append(SanitizeExcelValue(GetColumnValue(row, columns[index])));
-                if (index < columns.Length - 1)
-                {
-                    content.Append('\t');
-                }
+                content.Append("</td>");
             }
 
-            content.AppendLine();
+            content.Append("</tr>");
         }
+
+        content.Append("</table></body></html>");
 
         string fileName = "CourseWisePaymentDetails_" + DateTime.Now.ToString("yyyyMMddHHmmss", CultureInfo.InvariantCulture) + ".xls";
 
         Response.Clear();
+        Response.ClearHeaders();
+        Response.ClearContent();
         Response.Buffer = true;
         Response.Charset = string.Empty;
         Response.ContentType = "application/vnd.ms-excel";
         Response.AppendHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
         Response.Write(content.ToString());
-        //Response.Flush();
+        Response.Flush();
         _exportingExcel = true;
         HttpContext.Current.ApplicationInstance.CompleteRequest();
     }
@@ -382,7 +386,7 @@ ORDER BY Course_Schedule.Schedule_ID DESC", con))
             cleanedValue = "'" + cleanedValue;
         }
 
-        return cleanedValue;
+        return HttpUtility.HtmlEncode(cleanedValue);
     }
 
     private string GetColumnValue(DataRow row, string columnName)
