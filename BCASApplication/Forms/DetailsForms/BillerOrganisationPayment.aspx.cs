@@ -33,10 +33,10 @@ public partial class Forms_DetailsForms_BillerOrganisationPayment : System.Web.U
 
         if (!Page.IsPostBack)
         {
-            
+
             //lblPayeeOrgName.Text = Session["OrgName"].ToString();
 
-           
+
 
             if (Convert.ToString(HttpContext.Current.Session["UserId"]).Trim().Length == 0)
             {
@@ -54,7 +54,10 @@ public partial class Forms_DetailsForms_BillerOrganisationPayment : System.Web.U
             }
             ddlSponsoredOrg.SelectedValue = Session["UserOrg"].ToString();
 
-        }  
+            // Load proforma invoices for the selected organization
+            LoadProformaInvoices();
+
+        }
 
 
     }
@@ -182,6 +185,63 @@ public partial class Forms_DetailsForms_BillerOrganisationPayment : System.Web.U
         }
     }
 
+
+    protected void ddlSponsoredOrg_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        txtAmount.Text = "";
+        lblExamDate.Text = "";
+        lblCourseName.Text = "";
+        lblFeeAmount.Text = "";
+        lblServiceTax.Text = "";
+
+        LoadProformaInvoices();
+    }
+
+    private void LoadProformaInvoices()
+    {
+        ddlProformaInvoice.Items.Clear();
+        ddlProformaInvoice.Items.Insert(0, new ListItem("--Select--", "0"));
+
+        if (ddlSponsoredOrg.SelectedValue != null && ddlSponsoredOrg.SelectedValue != "0")
+        {
+            Int64 OrgID = Convert.ToInt64(ddlSponsoredOrg.SelectedValue);
+            Int64 PayeeOrgID = Convert.ToInt64(Session["UserOrg"].ToString());
+
+            string constr = ConfigurationManager.ConnectionStrings["BCASConnectionString"].ConnectionString;
+            using (SqlConnection con = new SqlConnection(constr))
+            {
+                using (SqlCommand cmd = new SqlCommand())
+                {
+                    // Query to get unpaid proforma invoices for the selected organization
+                    cmd.CommandText = @"SELECT p.ID, p.Proforma_Invoice_No, cs.Date_of_Exam, cm.Course_Name 
+                                       FROM Proforma_Invoice p 
+                                       JOIN Course_Schedule cs ON p.Schedule_ID = cs.Schedule_ID 
+                                       JOIN Course_Master cm ON cs.Course_Code = cm.Course_Code 
+                                       WHERE p.Sponsoring_OrgCode = @OrgID 
+                                       AND p.Payee_OrgCode = @PayeeOrgID 
+                                       AND p.Payment_Status = 'Pending'
+                                       AND cs.Date_of_Exam >= GETDATE()
+                                       ORDER BY cs.Date_of_Exam";
+
+                    cmd.Parameters.AddWithValue("@OrgID", OrgID);
+                    cmd.Parameters.AddWithValue("@PayeeOrgID", PayeeOrgID);
+                    cmd.Connection = con;
+                    con.Open();
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            string invoiceText = reader["Proforma_Invoice_No"].ToString();
+                            string invoiceValue = reader["ID"].ToString();
+                            ddlProformaInvoice.Items.Add(new ListItem(invoiceText, invoiceValue));
+                        }
+                    }
+                    con.Close();
+                }
+            }
+        }
+    }
 
     DateTime LastDatePayment = DateTime.Today.AddDays(-2);
     public void GetLastDateForPayment(Int64 ProformaInvoiceID, SqlTransaction trans, SqlConnection Conn)

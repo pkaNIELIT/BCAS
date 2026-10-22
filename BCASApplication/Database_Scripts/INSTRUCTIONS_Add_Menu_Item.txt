@@ -1,0 +1,172 @@
+===============================================================================
+INSTRUCTIONS TO ADD BillerOrganisationPayment.aspx TO MENU
+===============================================================================
+
+PROBLEM:
+The BillerOrganisationPayment.aspx page exists but PAYEE users cannot see it
+in the menu after login because it's not registered in the database.
+
+SOLUTION:
+Execute the SQL script to add the page to MenuMaster and RoleForm tables.
+
+===============================================================================
+METHOD 1: Using SQL Server Management Studio (SSMS)
+===============================================================================
+
+1. Open SQL Server Management Studio (SSMS)
+
+2. Connect to your BCAS database server:
+   - Server: localhost\SQLEXPRESS (or your SQL Server instance)
+   - Database: BCAS
+   - Authentication: Windows Authentication or SQL Server Authentication
+
+3. Open the SQL script:
+   - File → Open → File
+   - Navigate to: D:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\Database_Scripts\
+   - Select: Add_BillerOrganisationPayment_Menu.sql
+   - Click Open
+
+4. Execute the script:
+   - Click "Execute" button (or press F5)
+   - Review the output messages
+
+5. Verify the results:
+   - You should see SUCCESS messages
+   - Check the verification section at the end
+
+===============================================================================
+METHOD 2: Using Visual Studio / Visual Studio 2026
+===============================================================================
+
+1. In Visual Studio, open Server Explorer:
+   - View → Server Explorer (or press Ctrl+Alt+S)
+
+2. Add data connection (if not already connected):
+   - Right-click "Data Connections" → Add Connection
+   - Server name: localhost\SQLEXPRESS
+   - Database name: BCAS
+   - Click OK
+
+3. Run the SQL script:
+   - Right-click on the BCAS database connection
+   - Select "New Query"
+   - Open the file: BCASApplication\Database_Scripts\Add_BillerOrganisationPayment_Menu.sql
+   - Copy the entire content
+   - Paste into the query window
+   - Right-click in query window → Execute SQL
+
+===============================================================================
+METHOD 3: Using Command Line (sqlcmd)
+===============================================================================
+
+1. Open PowerShell or Command Prompt
+
+2. Navigate to the script directory:
+   cd "D:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\Database_Scripts"
+
+3. Run the script using sqlcmd:
+
+   For Windows Authentication:
+   sqlcmd -S localhost\SQLEXPRESS -d BCAS -i Add_BillerOrganisationPayment_Menu.sql
+
+   For SQL Server Authentication:
+   sqlcmd -S localhost\SQLEXPRESS -d BCAS -U sa -P YourPassword -i Add_BillerOrganisationPayment_Menu.sql
+
+4. Review the output for SUCCESS messages
+
+===============================================================================
+VERIFICATION AFTER RUNNING SCRIPT
+===============================================================================
+
+1. Check if script executed successfully:
+   - Look for "SCRIPT COMPLETED SUCCESSFULLY!" message
+   - Review the verification section output
+
+2. Check MenuMaster table manually:
+   SELECT * FROM MenuMaster 
+   WHERE FormName = '~/Forms/DetailsForms/BillerOrganisationPayment.aspx'
+
+   Expected result: 1 row with menu details
+
+3. Check RoleForm table:
+   SELECT * FROM RoleForm 
+   WHERE FormName = '~/Forms/DetailsForms/BillerOrganisationPayment.aspx'
+
+   Expected result: At least 1 row for PAYEE role
+
+===============================================================================
+TESTING THE MENU
+===============================================================================
+
+1. Close all browser windows
+
+2. Recycle IIS Application Pool (if using IIS):
+   - Open IIS Manager
+   - Navigate to Application Pools
+   - Right-click on BCAS app pool → Recycle
+
+   OR restart the development server in Visual Studio
+
+3. Open browser and navigate to:
+   http://localhost:2323/LoggedInHome.aspx (or your port number)
+
+4. Login with a PAYEE user account
+
+5. Verify the menu:
+   - Look for "Payments" menu (or similar parent menu)
+   - Click on it to expand
+   - You should see "Online Fee Payment" option
+   - Click it to open BillerOrganisationPayment.aspx
+
+===============================================================================
+TROUBLESHOOTING
+===============================================================================
+
+ISSUE: Menu item not appearing
+SOLUTION:
+- Clear browser cache (Ctrl+Shift+Delete)
+- Delete cookies for localhost
+- Restart IIS or development server
+- Verify role name is EXACTLY "PAYEE" (case-sensitive)
+
+ISSUE: "Access Denied" or redirect to Home.aspx
+SOLUTION:
+- Check RoleForm has entry for PAYEE role
+- Run this query to verify:
+  SELECT * FROM RoleForm WHERE RoleName = 'PAYEE' 
+  AND FormName LIKE '%BillerOrganisation%'
+
+ISSUE: SQL script fails with "MenuItemCode already exists"
+SOLUTION:
+- The script already has logic to skip if exists
+- If you still get error, manually change @NextMenuCode value
+
+ISSUE: Cannot find parent menu (Payments)
+SOLUTION:
+- Run this query to find correct parent menu:
+  SELECT MenuItemCode, MenuDescription FROM MenuMaster 
+  WHERE MenuLevel = 1 AND WhetherLeafMenu = 'N'
+- Update @PaymentsMenuCode in script with correct value
+
+===============================================================================
+ROLLBACK (If Needed)
+===============================================================================
+
+If you need to remove the menu item, run these commands:
+
+DELETE FROM RoleForm 
+WHERE FormName = '~/Forms/DetailsForms/BillerOrganisationPayment.aspx';
+
+DELETE FROM MenuMaster 
+WHERE FormName = '~/Forms/DetailsForms/BillerOrganisationPayment.aspx';
+
+===============================================================================
+CONTACT INFORMATION
+===============================================================================
+
+If you encounter issues:
+1. Check the Output window in the SQL tool for error messages
+2. Review the BCAS application logs
+3. Verify database connection string in Web.config
+
+===============================================================================

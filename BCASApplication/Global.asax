@@ -83,6 +83,17 @@ void Application_BeginRequest(object sender, EventArgs e)
         var response = ctx.Response;
         var nonce = ctx.Items["csp_nonce"] as string;
 
+        // Check if headers have already been sent - if so, cannot modify them
+        try
+        {
+            if (response.HeadersWritten)
+                return;
+        }
+        catch
+        {
+            // HeadersWritten not available in older .NET versions, continue
+        }
+
         try { response.Headers.Remove("X-XSS-Protection"); } catch { }
 
         AddIfMissing(response, "X-Content-Type-Options",    "nosniff");
@@ -100,8 +111,15 @@ void Application_BeginRequest(object sender, EventArgs e)
 
     void AddIfMissing(HttpResponse response, string header, string value)
     {
-        if (string.IsNullOrEmpty(response.Headers[header]))
-            response.AppendHeader(header, value);
+        try
+        {
+            if (string.IsNullOrEmpty(response.Headers[header]))
+                response.AppendHeader(header, value);
+        }
+        catch (HttpException)
+        {
+            // Headers already sent, silently ignore
+        }
     }
 
     void Application_Error(object sender, EventArgs e)

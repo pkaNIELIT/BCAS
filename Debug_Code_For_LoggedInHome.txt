@@ -1,0 +1,24 @@
+// =============================================
+// TEMPORARY DEBUG CODE
+// Add this to LoggedInHome.aspx.cs Page_Load
+// =============================================
+
+// Add at the top of Page_Load method, after the session check:
+protected void Page_Load(object sender, EventArgs e)
+{
+	if ((Convert.ToString(HttpContext.Current.Session["UserId"]).Trim().Length == 0))
+	{
+		HttpContext.Current.Response.Redirect("~/Home.aspx");
+		return;
+	}
+
+	// ===== ADD THIS DEBUG CODE =====
+	string debugUsername = Session["UserId"].ToString();
+	Response.Write($"<div style='background:yellow;padding:10px;'>DEBUG: Session UserId = '{debugUsername}'</div>");
+	// ===== END DEBUG CODE =====
+
+	// ... rest of your code
+}
+
+// This will show you the exact username that's stored in the session
+// Then use that EXACT username (with correct capitalization) in GetMenuData

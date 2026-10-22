@@ -20,8 +20,6 @@ public partial class _Default : System.Web.UI.Page
 {
     //TYP_AUDIT_TRAIL objAudit = new TYP_AUDIT_TRAIL();
 
-    // Control declarations
-    protected System.Web.UI.WebControls.HiddenField hfEncPwd;
 
     public void ClearCookies()
     {
@@ -60,19 +58,6 @@ public partial class _Default : System.Web.UI.Page
             {
 
                 Session["RNDam"] = val;
-
-                // SA May-2026: generate per-request AES-256 key+IV for password encryption
-                byte[] aesKey = new byte[32];
-                byte[] aesIv = new byte[16];
-                using (var rng = new System.Security.Cryptography.RNGCryptoServiceProvider())
-                {
-                    rng.GetBytes(aesKey);
-                    rng.GetBytes(aesIv);
-                }
-                ViewState["AesKey"] = Convert.ToBase64String(aesKey);
-                ViewState["AesIV"]  = Convert.ToBase64String(aesIv);
-                hfKey.Value = Convert.ToBase64String(aesKey) + ":" + Convert.ToBase64String(aesIv);
-
                 UserName.Focus();
 
                 //logout_test();
@@ -301,66 +286,57 @@ public partial class _Default : System.Web.UI.Page
         if (ValidateUser())
         {
             string rds = string.Empty;
-            
+
             //******* Fresh Code 21.12.2012            
             if (Page.IsValid)
             {
-                // SA May-2026: AES-decrypt browser-encrypted password; reject plaintext submissions
-                string plainPassword = string.Empty;
-                {
-                    string encPwd    = hfEncPwd.Value;
-                    string aesKeyB64 = ViewState["AesKey"] as string;
-                    string aesIvB64  = ViewState["AesIV"]  as string;
-                    if (!string.IsNullOrEmpty(encPwd) && aesKeyB64 != null && aesIvB64 != null)
-                    {
-                        try
-                        {
-                            byte[] key    = Convert.FromBase64String(aesKeyB64);
-                            byte[] iv     = Convert.FromBase64String(aesIvB64);
-                            byte[] cipher = Convert.FromBase64String(encPwd);
-                            using (var aes = new System.Security.Cryptography.AesCryptoServiceProvider())
-                            {
-                                aes.Key     = key;
-                                aes.IV      = iv;
-                                aes.Mode    = System.Security.Cryptography.CipherMode.CBC;
-                                aes.Padding = System.Security.Cryptography.PaddingMode.PKCS7;
-                                using (var dec = aes.CreateDecryptor())
-                                {
-                                    byte[] plain = dec.TransformFinalBlock(cipher, 0, cipher.Length);
-                                    plainPassword = System.Text.Encoding.UTF8.GetString(plain);
-                                }
-                            }
-                        }
-                        catch
-                        {
-                            UserName.Text = "";
-                            TxtPassword.Text = "";
-                            lblError.Text = "Incorrect user name or password";
-                            lblError.Visible = true;
-                            return;
-                        }
-                    }
-                    else
-                    {
-                        UserName.Text = "";
-                        TxtPassword.Text = "";
-                        lblError.Text = "Incorrect user name or password";
-                        lblError.Visible = true;
-                        return;
-                    }
-                }
-
                 //$$$$$$$$$$$$
 
                 //*******Retrieve Password Here
                 TYP_ApplicantDetails obj = new TYP_ApplicantDetails();
-                string UID = UserName.Text.Trim();
-                DataTable dt = obj.GetPassword(UID);
-                string UserID = "";
-                if (dt.Rows.Count > 0)
-                    UserID = dt.Rows[0]["UserId"].ToString().ToLower();
+                string UID;
+                UID = UserName.Text.Trim();
+                DataTable dt;
+                dt = obj.GetPassword(UID);
+                String usr, pwd, UserID;
+                usr = String.Empty;
+                pwd = String.Empty;
+                pwd = "";
+                UserID = "";
 
-                //$$$$$$$$$$$$
+                if (dt.Rows.Count > 0)
+                {
+                    pwd = dt.Rows[0]["Password"].ToString();
+                    usr = dt.Rows[0]["UserName"].ToString();
+                    UserID = dt.Rows[0]["UserId"].ToString();
+                    UserID = UserID.ToLower();
+                }
+
+                //###########
+
+                // TxtPassword.Text = TxtPassword.Text.ToUpper();
+
+                /***********************changed code***********************************************************************************************/
+                String newpass, totalhashpass;
+                String hashpass;
+
+                // hashpass = pwd.ToLower() + Session["RNDam"].ToString();
+
+                hashpass = pwd + Session["RNDam"].ToString();
+
+                SHA1 sha = SHA1.Create();
+
+                System.Text.UTF8Encoding enc = new System.Text.UTF8Encoding();
+
+                byte[] comb = enc.GetBytes(hashpass);
+
+                byte[] dige = sha.ComputeHash(comb);
+
+                newpass = BitConverter.ToString(dige).ToString();
+
+                totalhashpass = newpass.Replace("-", "");
+
+                //$$$$$$$$$$$$                
                 //objAudit.v_UserName = UserName.Text.Trim();
                 //objAudit.v_IP = HttpContext.Current.Request.UserHostAddress;
 
@@ -389,9 +365,7 @@ public partial class _Default : System.Web.UI.Page
                     lblError.Text = "user account locked out";
                     lblError.Visible = true;
                 }
-                // [SECURITY AUDIT May-2026] Removed "|| 1==1" that was bypassing credential validation entirely.
-                else if (Membership.ValidateUser(UserName.Text, plainPassword))
-                // [END SECURITY AUDIT]
+                else if (Membership.ValidateUser(UserName.Text, TxtPassword.Text))
                 // else if (usr.ToLower () == UserName.Text.ToLower () && totalhashpass == TxtPassword.Text)
                 // else if (usr == UserName.Text && totalhashpass != TxtPassword.Text)
                 {
@@ -490,12 +464,6 @@ public partial class _Default : System.Web.UI.Page
                     ////*******Till Here
                     //deep add code 19 july 2017
                     var roleslist = Roles.GetRolesForUser(UserName.Text.Trim());
-                    if (roleslist.Length == 0)
-                    {
-                        lblError.Text = "Incorrect user name or password";
-                        lblError.Visible = true;
-                        return;
-                    }
 
                     //string roleslist = Roles.GetRolesForUser(Login1.UserName).ToString ();
 

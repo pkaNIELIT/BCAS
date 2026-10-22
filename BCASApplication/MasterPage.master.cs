@@ -90,14 +90,40 @@ public partial class MasterPage : System.Web.UI.MasterPage
 
                     lblWelcome.Text = "Welcome:";
                     lblWelcome.Visible = true;
-                    LoginStatus.Visible = Convert.ToBoolean(Session["View_Login"].ToString());
 
-                    String UserName = Session["UserId"].ToString();
-                    DataTable menudata = TYP_MENUMASTER.GetMenuData(UserName);
-                    //DataTable menudata = TYP_MENUMASTER.GetMenuData(HttpContext.Current.User.Identity.Name);
+                    // Added null check for Session variables
+                    if (Session["View_Login"] != null)
+                    {
+                        LoginStatus.Visible = Convert.ToBoolean(Session["View_Login"].ToString());
+                    }
+                    else
+                    {
+                        LoginStatus.Visible = false;
+                    }
 
-                    //DataTable menudata = TYP_MENUMASTER.GetMenuData(HttpContext.Current.User.Identity.Name);
-                    AddTopMenuItems(menudata);
+                    // Added null check for UserId session variable
+                    if (Session["UserId"] != null && !string.IsNullOrEmpty(Session["UserId"].ToString()))
+                    {
+                        String UserName = Session["UserId"].ToString();
+                        DataTable menudata = TYP_MENUMASTER.GetMenuData(UserName);
+                        //DataTable menudata = TYP_MENUMASTER.GetMenuData(HttpContext.Current.User.Identity.Name);
+
+                        //DataTable menudata = TYP_MENUMASTER.GetMenuData(HttpContext.Current.User.Identity.Name);
+                        if (menudata != null && menudata.Rows.Count > 0)
+                        {
+                            AddTopMenuItems(menudata);
+                        }
+                        else
+                        {
+                            // If no menu data, redirect to login
+                            HttpContext.Current.Response.Redirect("~/Home.aspx");
+                        }
+                    }
+                    else
+                    {
+                        // If UserId session is null or empty, redirect to login
+                        HttpContext.Current.Response.Redirect("~/Home.aspx");
+                    }
 
                 }
 

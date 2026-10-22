@@ -1,0 +1,594 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet type="text/xsl" href="c:\program files\microsoft visual studio\18\community\team tools\static analysis tools\fxcop\Xml\CodeAnalysisReport.xsl"?>
+<FxCopReport Version="18.0">
+ <Targets>
+  <Target Name="C:\Users\PRANAV K AGRAWAL\AppData\Local\Temp\tmp40CD.tmp.cadir\bin\App_Code.dll">
+   <Modules>
+    <Module Name="app_code.dll">
+     <Namespaces>
+      <Namespace Name="">
+       <Types>
+        <Type Name="EncryptDecrypt" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#DecryptString(System.String)" Kind="Method" Static="True" Accessibility="Public" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="Do not dispose objects multiple times" Category="Microsoft.Usage" CheckId="CA2202" Status="Active" Created="2026-08-11 09:47:52Z" FixCategory="DependsOnFix">
+             <Issue Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\App_Code" File="EncryptDecrypt.cs" Line="59">Object 'cryptoStream' can be disposed more than once in method 'EncryptDecrypt.DecryptString(string)'. To avoid generating a System.ObjectDisposedException you should not call Dispose more than one time on an object.: Lines: 59</Issue>
+             <Issue Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\App_Code" File="EncryptDecrypt.cs" Line="59">Object 'memoryStream' can be disposed more than once in method 'EncryptDecrypt.DecryptString(string)'. To avoid generating a System.ObjectDisposedException you should not call Dispose more than one time on an object.: Lines: 59</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#EncryptString(System.String)" Kind="Method" Static="True" Accessibility="Public" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="Do not dispose objects multiple times" Category="Microsoft.Usage" CheckId="CA2202" Status="Active" Created="2026-08-11 09:47:52Z" FixCategory="DependsOnFix">
+             <Issue Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\App_Code" File="EncryptDecrypt.cs" Line="32">Object 'cryptoStream' can be disposed more than once in method 'EncryptDecrypt.EncryptString(string)'. To avoid generating a System.ObjectDisposedException you should not call Dispose more than one time on an object.: Lines: 32</Issue>
+             <Issue Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\App_Code" File="EncryptDecrypt.cs" Line="32">Object 'memoryStream' can be disposed more than once in method 'EncryptDecrypt.EncryptString(string)'. To avoid generating a System.ObjectDisposedException you should not call Dispose more than one time on an object.: Lines: 32, 33</Issue>
+            </Message>
+           </Messages>
+          </Member>
+         </Members>
+        </Type>
+       </Types>
+      </Namespace>
+      <Namespace Name="SqlServerTypes">
+       <Types>
+        <Type Name="Utilities" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#LoadLibrary(System.String)" Kind="Method" Static="True" Accessibility="Private" ExternallyVisible="False">
+           <Messages>
+            <Message TypeName="MovePInvokesToNativeMethodsClass" Category="Microsoft.Design" CheckId="CA1060" Status="Active" Created="2026-08-11 09:47:52Z" FixCategory="Breaking">
+             <Issue Certainty="95" Level="CriticalWarning">Because it is a P/Invoke method, 'Utilities.LoadLibrary(string)' should be defined in a class named NativeMethods, SafeNativeMethods, or UnsafeNativeMethods.</Issue>
+            </Message>
+            <Message Id="0" TypeName="SpecifyMarshalingForPInvokeStringArguments" Category="Microsoft.Globalization" CheckId="CA2101" Status="Active" Created="2026-08-11 09:47:52Z" FixCategory="NonBreaking">
+             <Issue Name="Parameter" Certainty="75" Level="Error">To reduce security risk, marshal parameter 'libname' as Unicode, by setting DllImport.CharSet to CharSet.Unicode, or by explicitly marshaling the parameter as UnmanagedType.LPWStr. If you need to marshal this string as ANSI or system-dependent, set BestFitMapping=false; for added security, also set ThrowOnUnmappableChar=true.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+         </Members>
+        </Type>
+       </Types>
+      </Namespace>
+     </Namespaces>
+    </Module>
+   </Modules>
+  </Target>
+  <Target Name="C:\Users\PRANAV K AGRAWAL\AppData\Local\Temp\tmp40CD.tmp.cadir\bin\App_Web_0ll3xmml.dll">
+   <Modules>
+    <Module Name="app_web_0ll3xmml.dll">
+     <Namespaces>
+      <Namespace Name="">
+       <Types>
+        <Type Name="Forms_DetailsForms_BCAS_DwnProformaInvoice" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#btnUpdateStatus_Click(System.Object,System.EventArgs)" Kind="Method" Static="False" Accessibility="Family" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="Do not dispose objects multiple times" Category="Microsoft.Usage" CheckId="CA2202" Status="Active" Created="2026-08-11 09:47:52Z" FixCategory="DependsOnFix">
+             <Issue Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\Forms\DetailsForms" File="BCAS_DwnProformaInvoice.aspx.cs" Line="419">Object 'sw' can be disposed more than once in method 'Forms_DetailsForms_BCAS_DwnProformaInvoice.btnUpdateStatus_Click(object, EventArgs)'. To avoid generating a System.ObjectDisposedException you should not call Dispose more than one time on an object.: Lines: 419</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#ddlBillerOrganisation_SelectedIndexChanged(System.Object,System.EventArgs)" Kind="Method" Static="False" Accessibility="Family" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="Do not dispose objects multiple times" Category="Microsoft.Usage" CheckId="CA2202" Status="Active" Created="2026-08-11 09:47:52Z" FixCategory="DependsOnFix">
+             <Issue Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\Forms\DetailsForms" File="BCAS_DwnProformaInvoice.aspx.cs" Line="701">Object 'con' can be disposed more than once in method 'Forms_DetailsForms_BCAS_DwnProformaInvoice.ddlBillerOrganisation_SelectedIndexChanged(object, EventArgs)'. To avoid generating a System.ObjectDisposedException you should not call Dispose more than one time on an object.: Lines: 701</Issue>
+            </Message>
+            <Message TypeName="Review SQL queries for security vulnerabilities" Category="Microsoft.Security" CheckId="CA2100" Status="Active" Created="2026-08-11 09:47:52Z" FixCategory="DependsOnFix">
+             <Issue Name="WithNonLiterals" Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\Forms\DetailsForms" File="BCAS_DwnProformaInvoice.aspx.cs" Line="681">The query string passed to 'SqlCommand.CommandText.set(string)' in 'Forms_DetailsForms_BCAS_DwnProformaInvoice.ddlBillerOrganisation_SelectedIndexChanged(object, EventArgs)' could contain the following variables 'cmd.CommandText'. If any of these variables could come from user input, consider using a stored procedure or a parameterized SQL query instead of building the query with string concatenations.</Issue>
+             <Issue Name="WithNonLiterals" Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\Forms\DetailsForms" File="BCAS_DwnProformaInvoice.aspx.cs" Line="682">The query string passed to 'SqlCommand.CommandText.set(string)' in 'Forms_DetailsForms_BCAS_DwnProformaInvoice.ddlBillerOrganisation_SelectedIndexChanged(object, EventArgs)' could contain the following variables 'cmd.CommandText'. If any of these variables could come from user input, consider using a stored procedure or a parameterized SQL query instead of building the query with string concatenations.</Issue>
+             <Issue Name="WithNonLiterals" Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\Forms\DetailsForms" File="BCAS_DwnProformaInvoice.aspx.cs" Line="683">The query string passed to 'SqlCommand.CommandText.set(string)' in 'Forms_DetailsForms_BCAS_DwnProformaInvoice.ddlBillerOrganisation_SelectedIndexChanged(object, EventArgs)' could contain the following variables 'cmd.CommandText'. If any of these variables could come from user input, consider using a stored procedure or a parameterized SQL query instead of building the query with string concatenations.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#ddlOrganisation_SelectedIndexChanged(System.Object,System.EventArgs)" Kind="Method" Static="False" Accessibility="Family" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="Do not dispose objects multiple times" Category="Microsoft.Usage" CheckId="CA2202" Status="Active" Created="2026-08-11 09:47:52Z" FixCategory="DependsOnFix">
+             <Issue Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\Forms\DetailsForms" File="BCAS_DwnProformaInvoice.aspx.cs" Line="661">Object 'con' can be disposed more than once in method 'Forms_DetailsForms_BCAS_DwnProformaInvoice.ddlOrganisation_SelectedIndexChanged(object, EventArgs)'. To avoid generating a System.ObjectDisposedException you should not call Dispose more than one time on an object.: Lines: 661</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#ddlSchedule_SelectedIndexChanged(System.Object,System.EventArgs)" Kind="Method" Static="False" Accessibility="Family" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="Do not dispose objects multiple times" Category="Microsoft.Usage" CheckId="CA2202" Status="Active" Created="2026-08-11 09:47:52Z" FixCategory="DependsOnFix">
+             <Issue Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\Forms\DetailsForms" File="BCAS_DwnProformaInvoice.aspx.cs" Line="625">Object 'con' can be disposed more than once in method 'Forms_DetailsForms_BCAS_DwnProformaInvoice.ddlSchedule_SelectedIndexChanged(object, EventArgs)'. To avoid generating a System.ObjectDisposedException you should not call Dispose more than one time on an object.: Lines: 625</Issue>
+            </Message>
+            <Message TypeName="Review SQL queries for security vulnerabilities" Category="Microsoft.Security" CheckId="CA2100" Status="Active" Created="2026-08-11 09:47:52Z" FixCategory="DependsOnFix">
+             <Issue Name="WithNonLiterals" Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\Forms\DetailsForms" File="BCAS_DwnProformaInvoice.aspx.cs" Line="601">The query string passed to 'SqlCommand.CommandText.set(string)' in 'Forms_DetailsForms_BCAS_DwnProformaInvoice.ddlSchedule_SelectedIndexChanged(object, EventArgs)' could contain the following variables 'cmd.CommandText'. If any of these variables could come from user input, consider using a stored procedure or a parameterized SQL query instead of building the query with string concatenations.</Issue>
+             <Issue Name="WithNonLiterals" Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\Forms\DetailsForms" File="BCAS_DwnProformaInvoice.aspx.cs" Line="602">The query string passed to 'SqlCommand.CommandText.set(string)' in 'Forms_DetailsForms_BCAS_DwnProformaInvoice.ddlSchedule_SelectedIndexChanged(object, EventArgs)' could contain the following variables 'cmd.CommandText'. If any of these variables could come from user input, consider using a stored procedure or a parameterized SQL query instead of building the query with string concatenations.</Issue>
+             <Issue Name="WithNonLiterals" Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\Forms\DetailsForms" File="BCAS_DwnProformaInvoice.aspx.cs" Line="603">The query string passed to 'SqlCommand.CommandText.set(string)' in 'Forms_DetailsForms_BCAS_DwnProformaInvoice.ddlSchedule_SelectedIndexChanged(object, EventArgs)' could contain the following variables 'cmd.CommandText'. If any of these variables could come from user input, consider using a stored procedure or a parameterized SQL query instead of building the query with string concatenations.</Issue>
+             <Issue Name="WithNonLiterals" Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\Forms\DetailsForms" File="BCAS_DwnProformaInvoice.aspx.cs" Line="604">The query string passed to 'SqlCommand.CommandText.set(string)' in 'Forms_DetailsForms_BCAS_DwnProformaInvoice.ddlSchedule_SelectedIndexChanged(object, EventArgs)' could contain the following variables 'cmd.CommandText'. If any of these variables could come from user input, consider using a stored procedure or a parameterized SQL query instead of building the query with string concatenations.</Issue>
+             <Issue Name="WithNonLiterals" Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\Forms\DetailsForms" File="BCAS_DwnProformaInvoice.aspx.cs" Line="605">The query string passed to 'SqlCommand.CommandText.set(string)' in 'Forms_DetailsForms_BCAS_DwnProformaInvoice.ddlSchedule_SelectedIndexChanged(object, EventArgs)' could contain the following variables 'cmd.CommandText'. If any of these variables could come from user input, consider using a stored procedure or a parameterized SQL query instead of building the query with string concatenations.</Issue>
+             <Issue Name="WithNonLiterals" Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\Forms\DetailsForms" File="BCAS_DwnProformaInvoice.aspx.cs" Line="606">The query string passed to 'SqlCommand.CommandText.set(string)' in 'Forms_DetailsForms_BCAS_DwnProformaInvoice.ddlSchedule_SelectedIndexChanged(object, EventArgs)' could contain the following variables 'cmd.CommandText'. If any of these variables could come from user input, consider using a stored procedure or a parameterized SQL query instead of building the query with string concatenations.</Issue>
+             <Issue Name="WithNonLiterals" Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\Forms\DetailsForms" File="BCAS_DwnProformaInvoice.aspx.cs" Line="607">The query string passed to 'SqlCommand.CommandText.set(string)' in 'Forms_DetailsForms_BCAS_DwnProformaInvoice.ddlSchedule_SelectedIndexChanged(object, EventArgs)' could contain the following variables 'cmd.CommandText'. If any of these variables could come from user input, consider using a stored procedure or a parameterized SQL query instead of building the query with string concatenations.</Issue>
+             <Issue Name="WithNonLiterals" Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\Forms\DetailsForms" File="BCAS_DwnProformaInvoice.aspx.cs" Line="608">The query string passed to 'SqlCommand.CommandText.set(string)' in 'Forms_DetailsForms_BCAS_DwnProformaInvoice.ddlSchedule_SelectedIndexChanged(object, EventArgs)' could contain the following variables 'cmd.CommandText'. If any of these variables could come from user input, consider using a stored procedure or a parameterized SQL query instead of building the query with string concatenations.</Issue>
+             <Issue Name="WithNonLiterals" Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\Forms\DetailsForms" File="BCAS_DwnProformaInvoice.aspx.cs" Line="609">The query string passed to 'SqlCommand.CommandText.set(string)' in 'Forms_DetailsForms_BCAS_DwnProformaInvoice.ddlSchedule_SelectedIndexChanged(object, EventArgs)' could contain the following variables 'cmd.CommandText'. If any of these variables could come from user input, consider using a stored procedure or a parameterized SQL query instead of building the query with string concatenations.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+         </Members>
+        </Type>
+        <Type Name="Forms_DetailsForms_BCAS_TaxInvoice" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#btnUpdateStatus_Click(System.Object,System.EventArgs)" Kind="Method" Static="False" Accessibility="Family" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="Do not dispose objects multiple times" Category="Microsoft.Usage" CheckId="CA2202" Status="Active" Created="2026-08-11 09:47:52Z" FixCategory="DependsOnFix">
+             <Issue Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\Forms\DetailsForms" File="BCAS_TaxInvoice.aspx.cs" Line="497">Object 'sw' can be disposed more than once in method 'Forms_DetailsForms_BCAS_TaxInvoice.btnUpdateStatus_Click(object, EventArgs)'. To avoid generating a System.ObjectDisposedException you should not call Dispose more than one time on an object.: Lines: 497</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#ddlBillerOrganisation_SelectedIndexChanged(System.Object,System.EventArgs)" Kind="Method" Static="False" Accessibility="Family" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="Do not dispose objects multiple times" Category="Microsoft.Usage" CheckId="CA2202" Status="Active" Created="2026-08-11 09:47:52Z" FixCategory="DependsOnFix">
+             <Issue Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\Forms\DetailsForms" File="BCAS_TaxInvoice.aspx.cs" Line="883">Object 'con' can be disposed more than once in method 'Forms_DetailsForms_BCAS_TaxInvoice.ddlBillerOrganisation_SelectedIndexChanged(object, EventArgs)'. To avoid generating a System.ObjectDisposedException you should not call Dispose more than one time on an object.: Lines: 883</Issue>
+            </Message>
+            <Message TypeName="Review SQL queries for security vulnerabilities" Category="Microsoft.Security" CheckId="CA2100" Status="Active" Created="2026-08-11 09:47:52Z" FixCategory="DependsOnFix">
+             <Issue Name="WithNonLiterals" Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\Forms\DetailsForms" File="BCAS_TaxInvoice.aspx.cs" Line="864">The query string passed to 'SqlCommand.CommandText.set(string)' in 'Forms_DetailsForms_BCAS_TaxInvoice.ddlBillerOrganisation_SelectedIndexChanged(object, EventArgs)' could contain the following variables 'cmd.CommandText'. If any of these variables could come from user input, consider using a stored procedure or a parameterized SQL query instead of building the query with string concatenations.</Issue>
+             <Issue Name="WithNonLiterals" Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\Forms\DetailsForms" File="BCAS_TaxInvoice.aspx.cs" Line="865">The query string passed to 'SqlCommand.CommandText.set(string)' in 'Forms_DetailsForms_BCAS_TaxInvoice.ddlBillerOrganisation_SelectedIndexChanged(object, EventArgs)' could contain the following variables 'cmd.CommandText'. If any of these variables could come from user input, consider using a stored procedure or a parameterized SQL query instead of building the query with string concatenations.</Issue>
+             <Issue Name="WithNonLiterals" Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\Forms\DetailsForms" File="BCAS_TaxInvoice.aspx.cs" Line="866">The query string passed to 'SqlCommand.CommandText.set(string)' in 'Forms_DetailsForms_BCAS_TaxInvoice.ddlBillerOrganisation_SelectedIndexChanged(object, EventArgs)' could contain the following variables 'cmd.CommandText'. If any of these variables could come from user input, consider using a stored procedure or a parameterized SQL query instead of building the query with string concatenations.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#ddlOrganisation_SelectedIndexChanged(System.Object,System.EventArgs)" Kind="Method" Static="False" Accessibility="Family" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="Do not dispose objects multiple times" Category="Microsoft.Usage" CheckId="CA2202" Status="Active" Created="2026-08-11 09:47:52Z" FixCategory="DependsOnFix">
+             <Issue Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\Forms\DetailsForms" File="BCAS_TaxInvoice.aspx.cs" Line="825">Object 'con' can be disposed more than once in method 'Forms_DetailsForms_BCAS_TaxInvoice.ddlOrganisation_SelectedIndexChanged(object, EventArgs)'. To avoid generating a System.ObjectDisposedException you should not call Dispose more than one time on an object.: Lines: 825</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#ddlSchedule_SelectedIndexChanged(System.Object,System.EventArgs)" Kind="Method" Static="False" Accessibility="Family" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="Do not dispose objects multiple times" Category="Microsoft.Usage" CheckId="CA2202" Status="Active" Created="2026-08-11 09:47:52Z" FixCategory="DependsOnFix">
+             <Issue Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\Forms\DetailsForms" File="BCAS_TaxInvoice.aspx.cs" Line="790">Object 'con' can be disposed more than once in method 'Forms_DetailsForms_BCAS_TaxInvoice.ddlSchedule_SelectedIndexChanged(object, EventArgs)'. To avoid generating a System.ObjectDisposedException you should not call Dispose more than one time on an object.: Lines: 790</Issue>
+            </Message>
+            <Message TypeName="Review SQL queries for security vulnerabilities" Category="Microsoft.Security" CheckId="CA2100" Status="Active" Created="2026-08-11 09:47:52Z" FixCategory="DependsOnFix">
+             <Issue Name="WithNonLiterals" Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\Forms\DetailsForms" File="BCAS_TaxInvoice.aspx.cs" Line="766">The query string passed to 'SqlCommand.CommandText.set(string)' in 'Forms_DetailsForms_BCAS_TaxInvoice.ddlSchedule_SelectedIndexChanged(object, EventArgs)' could contain the following variables 'cmd.CommandText'. If any of these variables could come from user input, consider using a stored procedure or a parameterized SQL query instead of building the query with string concatenations.</Issue>
+             <Issue Name="WithNonLiterals" Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\Forms\DetailsForms" File="BCAS_TaxInvoice.aspx.cs" Line="767">The query string passed to 'SqlCommand.CommandText.set(string)' in 'Forms_DetailsForms_BCAS_TaxInvoice.ddlSchedule_SelectedIndexChanged(object, EventArgs)' could contain the following variables 'cmd.CommandText'. If any of these variables could come from user input, consider using a stored procedure or a parameterized SQL query instead of building the query with string concatenations.</Issue>
+             <Issue Name="WithNonLiterals" Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\Forms\DetailsForms" File="BCAS_TaxInvoice.aspx.cs" Line="768">The query string passed to 'SqlCommand.CommandText.set(string)' in 'Forms_DetailsForms_BCAS_TaxInvoice.ddlSchedule_SelectedIndexChanged(object, EventArgs)' could contain the following variables 'cmd.CommandText'. If any of these variables could come from user input, consider using a stored procedure or a parameterized SQL query instead of building the query with string concatenations.</Issue>
+             <Issue Name="WithNonLiterals" Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\Forms\DetailsForms" File="BCAS_TaxInvoice.aspx.cs" Line="769">The query string passed to 'SqlCommand.CommandText.set(string)' in 'Forms_DetailsForms_BCAS_TaxInvoice.ddlSchedule_SelectedIndexChanged(object, EventArgs)' could contain the following variables 'cmd.CommandText'. If any of these variables could come from user input, consider using a stored procedure or a parameterized SQL query instead of building the query with string concatenations.</Issue>
+             <Issue Name="WithNonLiterals" Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\Forms\DetailsForms" File="BCAS_TaxInvoice.aspx.cs" Line="770">The query string passed to 'SqlCommand.CommandText.set(string)' in 'Forms_DetailsForms_BCAS_TaxInvoice.ddlSchedule_SelectedIndexChanged(object, EventArgs)' could contain the following variables 'cmd.CommandText'. If any of these variables could come from user input, consider using a stored procedure or a parameterized SQL query instead of building the query with string concatenations.</Issue>
+             <Issue Name="WithNonLiterals" Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\Forms\DetailsForms" File="BCAS_TaxInvoice.aspx.cs" Line="771">The query string passed to 'SqlCommand.CommandText.set(string)' in 'Forms_DetailsForms_BCAS_TaxInvoice.ddlSchedule_SelectedIndexChanged(object, EventArgs)' could contain the following variables 'cmd.CommandText'. If any of these variables could come from user input, consider using a stored procedure or a parameterized SQL query instead of building the query with string concatenations.</Issue>
+             <Issue Name="WithNonLiterals" Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\Forms\DetailsForms" File="BCAS_TaxInvoice.aspx.cs" Line="772">The query string passed to 'SqlCommand.CommandText.set(string)' in 'Forms_DetailsForms_BCAS_TaxInvoice.ddlSchedule_SelectedIndexChanged(object, EventArgs)' could contain the following variables 'cmd.CommandText'. If any of these variables could come from user input, consider using a stored procedure or a parameterized SQL query instead of building the query with string concatenations.</Issue>
+             <Issue Name="WithNonLiterals" Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\Forms\DetailsForms" File="BCAS_TaxInvoice.aspx.cs" Line="773">The query string passed to 'SqlCommand.CommandText.set(string)' in 'Forms_DetailsForms_BCAS_TaxInvoice.ddlSchedule_SelectedIndexChanged(object, EventArgs)' could contain the following variables 'cmd.CommandText'. If any of these variables could come from user input, consider using a stored procedure or a parameterized SQL query instead of building the query with string concatenations.</Issue>
+             <Issue Name="WithNonLiterals" Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\Forms\DetailsForms" File="BCAS_TaxInvoice.aspx.cs" Line="774">The query string passed to 'SqlCommand.CommandText.set(string)' in 'Forms_DetailsForms_BCAS_TaxInvoice.ddlSchedule_SelectedIndexChanged(object, EventArgs)' could contain the following variables 'cmd.CommandText'. If any of these variables could come from user input, consider using a stored procedure or a parameterized SQL query instead of building the query with string concatenations.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+         </Members>
+        </Type>
+        <Type Name="Forms_DetailsForms_SponOrganisationPayment" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#ddlProformaInvoice_SelectedIndexChanged(System.Object,System.EventArgs)" Kind="Method" Static="False" Accessibility="Family" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="Do not dispose objects multiple times" Category="Microsoft.Usage" CheckId="CA2202" Status="Active" Created="2026-08-11 09:47:52Z" FixCategory="DependsOnFix">
+             <Issue Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\Forms\DetailsForms" File="SponOrganisationPayment.aspx.cs" Line="175">Object 'con' can be disposed more than once in method 'Forms_DetailsForms_SponOrganisationPayment.ddlProformaInvoice_SelectedIndexChanged(object, EventArgs)'. To avoid generating a System.ObjectDisposedException you should not call Dispose more than one time on an object.: Lines: 175</Issue>
+            </Message>
+           </Messages>
+          </Member>
+         </Members>
+        </Type>
+       </Types>
+      </Namespace>
+     </Namespaces>
+    </Module>
+   </Modules>
+  </Target>
+  <Target Name="C:\Users\PRANAV K AGRAWAL\AppData\Local\Temp\tmp40CD.tmp.cadir\bin\App_Web_bvuibbfc.dll">
+   <Modules>
+    <Module Name="app_web_bvuibbfc.dll">
+     <Namespaces>
+      <Namespace Name="">
+       <Types>
+        <Type Name="Reports_ScheduleOrgWiseCandidateDetails" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#GetAllExamLocation(System.String,System.Data.SqlClient.SqlParameter)" Kind="Method" Static="False" Accessibility="Private" ExternallyVisible="False">
+           <Messages>
+            <Message TypeName="Review SQL queries for security vulnerabilities" Category="Microsoft.Security" CheckId="CA2100" Status="Active" Created="2026-08-11 09:47:52Z" FixCategory="DependsOnFix">
+             <Issue Name="WithNonLiterals" Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\Reports" File="ScheduleOrgWiseCandidateDetails.aspx.cs" Line="97">The query string passed to 'SqlDataAdapter.SqlDataAdapter(string, SqlConnection)' in 'Reports_ScheduleOrgWiseCandidateDetails.GetAllExamLocation(string, SqlParameter)' could contain the following variables 'spname'. If any of these variables could come from user input, consider using a stored procedure or a parameterized SQL query instead of building the query with string concatenations.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+         </Members>
+        </Type>
+       </Types>
+      </Namespace>
+     </Namespaces>
+    </Module>
+   </Modules>
+  </Target>
+  <Target Name="C:\Users\PRANAV K AGRAWAL\AppData\Local\Temp\tmp40CD.tmp.cadir\bin\App_Web_fzdjtgzk.dll">
+   <Modules>
+    <Module Name="app_web_fzdjtgzk.dll">
+     <Namespaces>
+      <Namespace Name="">
+       <Types>
+        <Type Name="Forms_DetailsForms_Add_AadhaarNumber" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#Update_AadhaarNumber()" Kind="Method" Static="False" Accessibility="Family" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="Do not dispose objects multiple times" Category="Microsoft.Usage" CheckId="CA2202" Status="Active" Created="2026-08-11 09:47:52Z" FixCategory="DependsOnFix">
+             <Issue Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\Forms\DetailsForms" File="Add_AadhaarNumber.aspx.cs" Line="167">Object 'con' can be disposed more than once in method 'Forms_DetailsForms_Add_AadhaarNumber.Update_AadhaarNumber()'. To avoid generating a System.ObjectDisposedException you should not call Dispose more than one time on an object.: Lines: 167</Issue>
+            </Message>
+            <Message TypeName="RethrowToPreserveStackDetails" Category="Microsoft.Usage" CheckId="CA2200" Status="Active" Created="2026-08-11 09:47:52Z" FixCategory="NonBreaking">
+             <Issue Certainty="95" Level="Error" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\Forms\DetailsForms" File="Add_AadhaarNumber.aspx.cs" Line="160">'Forms_DetailsForms_Add_AadhaarNumber.Update_AadhaarNumber()' rethrows a caught exception and specifies it explicitly as an argument. Use 'throw' without an argument instead, in order to preserve the stack location where the exception was initially raised.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+         </Members>
+        </Type>
+        <Type Name="Forms_DetailsForms_BillerOrganisationPayment" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#btnPayNow_Click(System.Object,System.EventArgs)" Kind="Method" Static="False" Accessibility="Family" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="Do not dispose objects multiple times" Category="Microsoft.Usage" CheckId="CA2202" Status="Active" Created="2026-08-11 09:47:52Z" FixCategory="DependsOnFix">
+             <Issue Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\Forms\DetailsForms" File="BillerOrganisationPayment.aspx.cs" Line="149">Object 'Conn' can be disposed more than once in method 'Forms_DetailsForms_BillerOrganisationPayment.btnPayNow_Click(object, EventArgs)'. To avoid generating a System.ObjectDisposedException you should not call Dispose more than one time on an object.: Lines: 149</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#ddlProformaInvoice_SelectedIndexChanged(System.Object,System.EventArgs)" Kind="Method" Static="False" Accessibility="Family" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="Do not dispose objects multiple times" Category="Microsoft.Usage" CheckId="CA2202" Status="Active" Created="2026-08-11 09:47:52Z" FixCategory="DependsOnFix">
+             <Issue Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\Forms\DetailsForms" File="BillerOrganisationPayment.aspx.cs" Line="259">Object 'con' can be disposed more than once in method 'Forms_DetailsForms_BillerOrganisationPayment.ddlProformaInvoice_SelectedIndexChanged(object, EventArgs)'. To avoid generating a System.ObjectDisposedException you should not call Dispose more than one time on an object.: Lines: 259</Issue>
+            </Message>
+           </Messages>
+          </Member>
+         </Members>
+        </Type>
+       </Types>
+      </Namespace>
+     </Namespaces>
+    </Module>
+   </Modules>
+  </Target>
+  <Target Name="C:\Users\PRANAV K AGRAWAL\AppData\Local\Temp\tmp40CD.tmp.cadir\bin\App_Web_jxik0bdi.dll">
+   <Modules>
+    <Module Name="app_web_jxik0bdi.dll">
+     <Namespaces>
+      <Namespace Name="">
+       <Types>
+        <Type Name="Forms_DetailsForms_UpdateCandidatePayeeOrg" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#btnUpdatePayee_Click(System.Object,System.EventArgs)" Kind="Method" Static="False" Accessibility="Family" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="Do not dispose objects multiple times" Category="Microsoft.Usage" CheckId="CA2202" Status="Active" Created="2026-08-11 09:47:52Z" FixCategory="DependsOnFix">
+             <Issue Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\Forms\DetailsForms" File="UpdateCandidatePayeeOrg.aspx.cs" Line="159">Object 'objConn' can be disposed more than once in method 'Forms_DetailsForms_UpdateCandidatePayeeOrg.btnUpdatePayee_Click(object, EventArgs)'. To avoid generating a System.ObjectDisposedException you should not call Dispose more than one time on an object.: Lines: 159</Issue>
+            </Message>
+           </Messages>
+          </Member>
+         </Members>
+        </Type>
+       </Types>
+      </Namespace>
+     </Namespaces>
+    </Module>
+   </Modules>
+  </Target>
+  <Target Name="C:\Users\PRANAV K AGRAWAL\AppData\Local\Temp\tmp40CD.tmp.cadir\bin\App_Web_mcmn5s05.dll">
+   <Modules>
+    <Module Name="app_web_mcmn5s05.dll">
+     <Namespaces>
+      <Namespace Name="">
+       <Types>
+        <Type Name="Forms_DetailsForms_BCAS_ProformaInvoice" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#btnUpdateStatus_Click(System.Object,System.EventArgs)" Kind="Method" Static="False" Accessibility="Family" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="Do not dispose objects multiple times" Category="Microsoft.Usage" CheckId="CA2202" Status="Active" Created="2026-08-11 09:47:52Z" FixCategory="DependsOnFix">
+             <Issue Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\Forms\DetailsForms" File="BCAS_ProformaInvoice.aspx.cs" Line="300">Object 'Conn' can be disposed more than once in method 'Forms_DetailsForms_BCAS_ProformaInvoice.btnUpdateStatus_Click(object, EventArgs)'. To avoid generating a System.ObjectDisposedException you should not call Dispose more than one time on an object.: Lines: 300, 303</Issue>
+            </Message>
+           </Messages>
+          </Member>
+         </Members>
+        </Type>
+        <Type Name="Forms_DetailsForms_BCASReconcillation" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#btnUploadData_Click(System.Object,System.EventArgs)" Kind="Method" Static="False" Accessibility="Family" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="Do not dispose objects multiple times" Category="Microsoft.Usage" CheckId="CA2202" Status="Active" Created="2026-08-11 09:47:52Z" FixCategory="DependsOnFix">
+             <Issue Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\Forms\DetailsForms" File="BCASReconcillation.aspx.cs" Line="315">Object 'connection' can be disposed more than once in method 'Forms_DetailsForms_BCASReconcillation.btnUploadData_Click(object, EventArgs)'. To avoid generating a System.ObjectDisposedException you should not call Dispose more than one time on an object.: Lines: 315</Issue>
+             <Issue Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\Forms\DetailsForms" File="BCASReconcillation.aspx.cs" Line="312">Object 'dr' can be disposed more than once in method 'Forms_DetailsForms_BCASReconcillation.btnUploadData_Click(object, EventArgs)'. To avoid generating a System.ObjectDisposedException you should not call Dispose more than one time on an object.: Lines: 312</Issue>
+            </Message>
+           </Messages>
+          </Member>
+         </Members>
+        </Type>
+        <Type Name="Forms_DetailsForms_NominationEntryBySO" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#btnUpdatePayee_Click(System.Object,System.EventArgs)" Kind="Method" Static="False" Accessibility="Family" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="Do not dispose objects multiple times" Category="Microsoft.Usage" CheckId="CA2202" Status="Active" Created="2026-08-11 09:47:52Z" FixCategory="DependsOnFix">
+             <Issue Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\Forms\DetailsForms" File="NominationEntryBySO.aspx.cs" Line="292">Object 'objConn' can be disposed more than once in method 'Forms_DetailsForms_NominationEntryBySO.btnUpdatePayee_Click(object, EventArgs)'. To avoid generating a System.ObjectDisposedException you should not call Dispose more than one time on an object.: Lines: 292</Issue>
+            </Message>
+           </Messages>
+          </Member>
+         </Members>
+        </Type>
+       </Types>
+      </Namespace>
+     </Namespaces>
+    </Module>
+   </Modules>
+  </Target>
+  <Target Name="C:\Users\PRANAV K AGRAWAL\AppData\Local\Temp\tmp40CD.tmp.cadir\bin\App_Web_sbm2hpzf.dll">
+   <Modules>
+    <Module Name="app_web_sbm2hpzf.dll">
+     <Namespaces>
+      <Namespace Name="">
+       <Types>
+        <Type Name="Forms_DetailsForms_BCAS_Signed_eTaxInvoice_Upload" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#btn_BCAS_Signed_E_TaxInvoice_Click(System.Object,System.EventArgs)" Kind="Method" Static="False" Accessibility="Family" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="Do not dispose objects multiple times" Category="Microsoft.Usage" CheckId="CA2202" Status="Active" Created="2026-08-11 09:47:52Z" FixCategory="DependsOnFix">
+             <Issue Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\Forms\DetailsForms" File="BCAS_Signed_eTaxInvoice_Upload.aspx.cs" Line="227">Object 'sqlConnection' can be disposed more than once in method 'Forms_DetailsForms_BCAS_Signed_eTaxInvoice_Upload.btn_BCAS_Signed_E_TaxInvoice_Click(object, EventArgs)'. To avoid generating a System.ObjectDisposedException you should not call Dispose more than one time on an object.: Lines: 227</Issue>
+            </Message>
+           </Messages>
+          </Member>
+         </Members>
+        </Type>
+        <Type Name="Forms_DetailsForms_BCAS_Signed_TaxInvoice_Download_Payee" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#btn_BCAS_Signed_E_TaxInvoiceDownload_Click(System.Object,System.EventArgs)" Kind="Method" Static="False" Accessibility="Family" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="Do not dispose objects multiple times" Category="Microsoft.Usage" CheckId="CA2202" Status="Active" Created="2026-08-11 09:47:52Z" FixCategory="DependsOnFix">
+             <Issue Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\Forms\DetailsForms" File="BCAS_Signed_TaxInvoice_Download_Payee.aspx.cs" Line="341">Object 'objConn' can be disposed more than once in method 'Forms_DetailsForms_BCAS_Signed_TaxInvoice_Download_Payee.btn_BCAS_Signed_E_TaxInvoiceDownload_Click(object, EventArgs)'. To avoid generating a System.ObjectDisposedException you should not call Dispose more than one time on an object.: Lines: 341</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#btn_BCAS_SignedTaxInvoiceDownload_Click(System.Object,System.EventArgs)" Kind="Method" Static="False" Accessibility="Family" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="Do not dispose objects multiple times" Category="Microsoft.Usage" CheckId="CA2202" Status="Active" Created="2026-08-11 09:47:52Z" FixCategory="DependsOnFix">
+             <Issue Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\Forms\DetailsForms" File="BCAS_Signed_TaxInvoice_Download_Payee.aspx.cs" Line="286">Object 'objConn' can be disposed more than once in method 'Forms_DetailsForms_BCAS_Signed_TaxInvoice_Download_Payee.btn_BCAS_SignedTaxInvoiceDownload_Click(object, EventArgs)'. To avoid generating a System.ObjectDisposedException you should not call Dispose more than one time on an object.: Lines: 286</Issue>
+            </Message>
+           </Messages>
+          </Member>
+         </Members>
+        </Type>
+        <Type Name="Forms_DetailsForms_ExamDateExtension" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#ddlExistingCourse_SelectedIndexChanged(System.Object,System.EventArgs)" Kind="Method" Static="False" Accessibility="Family" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="Do not dispose objects multiple times" Category="Microsoft.Usage" CheckId="CA2202" Status="Active" Created="2026-08-11 09:47:52Z" FixCategory="DependsOnFix">
+             <Issue Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\Forms\DetailsForms" File="ExamDateExtension.aspx.cs" Line="139">Object 'con' can be disposed more than once in method 'Forms_DetailsForms_ExamDateExtension.ddlExistingCourse_SelectedIndexChanged(object, EventArgs)'. To avoid generating a System.ObjectDisposedException you should not call Dispose more than one time on an object.: Lines: 139</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#Page_Load(System.Object,System.EventArgs)" Kind="Method" Static="False" Accessibility="Family" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="Do not dispose objects multiple times" Category="Microsoft.Usage" CheckId="CA2202" Status="Active" Created="2026-08-11 09:47:52Z" FixCategory="DependsOnFix">
+             <Issue Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\Forms\DetailsForms" File="ExamDateExtension.aspx.cs" Line="55">Object 'con' can be disposed more than once in method 'Forms_DetailsForms_ExamDateExtension.Page_Load(object, EventArgs)'. To avoid generating a System.ObjectDisposedException you should not call Dispose more than one time on an object.: Lines: 55</Issue>
+            </Message>
+           </Messages>
+          </Member>
+         </Members>
+        </Type>
+       </Types>
+      </Namespace>
+     </Namespaces>
+    </Module>
+   </Modules>
+  </Target>
+  <Target Name="C:\Users\PRANAV K AGRAWAL\AppData\Local\Temp\tmp40CD.tmp.cadir\bin\App_Web_sqy3oq14.dll">
+   <Modules>
+    <Module Name="app_web_sqy3oq14.dll">
+     <Namespaces>
+      <Namespace Name="">
+       <Types>
+        <Type Name="Forms_DetailsForms_ApplicantDetails" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#drpStates_SelectedIndexChanged(System.Object,System.EventArgs)" Kind="Method" Static="False" Accessibility="Family" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="Do not dispose objects multiple times" Category="Microsoft.Usage" CheckId="CA2202" Status="Active" Created="2026-08-11 09:47:52Z" FixCategory="DependsOnFix">
+             <Issue Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\Forms\DetailsForms" File="ApplicantDetails.aspx.cs" Line="300">Object 'con' can be disposed more than once in method 'Forms_DetailsForms_ApplicantDetails.drpStates_SelectedIndexChanged(object, EventArgs)'. To avoid generating a System.ObjectDisposedException you should not call Dispose more than one time on an object.: Lines: 300</Issue>
+            </Message>
+           </Messages>
+          </Member>
+         </Members>
+        </Type>
+        <Type Name="Forms_DetailsForms_BCAS_Signed_TaxInvoice_Upload" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#btn_BCAS_SignedTaxInvoice_Click(System.Object,System.EventArgs)" Kind="Method" Static="False" Accessibility="Family" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="Do not dispose objects multiple times" Category="Microsoft.Usage" CheckId="CA2202" Status="Active" Created="2026-08-11 09:47:52Z" FixCategory="DependsOnFix">
+             <Issue Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\Forms\DetailsForms" File="BCAS_Signed_TaxInvoice_Upload.aspx.cs" Line="332">Object 'sqlConnection' can be disposed more than once in method 'Forms_DetailsForms_BCAS_Signed_TaxInvoice_Upload.btn_BCAS_SignedTaxInvoice_Click(object, EventArgs)'. To avoid generating a System.ObjectDisposedException you should not call Dispose more than one time on an object.: Lines: 332</Issue>
+            </Message>
+           </Messages>
+          </Member>
+         </Members>
+        </Type>
+        <Type Name="Forms_DetailsForms_UpdateCandidateDetails" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#BindCity(System.String)" Kind="Method" Static="False" Accessibility="Family" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="Do not dispose objects multiple times" Category="Microsoft.Usage" CheckId="CA2202" Status="Active" Created="2026-08-11 09:47:52Z" FixCategory="DependsOnFix">
+             <Issue Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\Forms\DetailsForms" File="UpdateCandidateDetails.aspx.cs" Line="222">Object 'con' can be disposed more than once in method 'Forms_DetailsForms_UpdateCandidateDetails.BindCity(string)'. To avoid generating a System.ObjectDisposedException you should not call Dispose more than one time on an object.: Lines: 222</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#drpStates_SelectedIndexChanged(System.Object,System.EventArgs)" Kind="Method" Static="False" Accessibility="Family" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="Do not dispose objects multiple times" Category="Microsoft.Usage" CheckId="CA2202" Status="Active" Created="2026-08-11 09:47:52Z" FixCategory="DependsOnFix">
+             <Issue Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\Forms\DetailsForms" File="UpdateCandidateDetails.aspx.cs" Line="260">Object 'con' can be disposed more than once in method 'Forms_DetailsForms_UpdateCandidateDetails.drpStates_SelectedIndexChanged(object, EventArgs)'. To avoid generating a System.ObjectDisposedException you should not call Dispose more than one time on an object.: Lines: 260</Issue>
+            </Message>
+           </Messages>
+          </Member>
+         </Members>
+        </Type>
+       </Types>
+      </Namespace>
+     </Namespaces>
+    </Module>
+   </Modules>
+  </Target>
+  <Target Name="C:\Users\PRANAV K AGRAWAL\AppData\Local\Temp\tmp40CD.tmp.cadir\bin\App_Web_v3a4l4l2.dll">
+   <Modules>
+    <Module Name="app_web_v3a4l4l2.dll">
+     <Namespaces>
+      <Namespace Name="">
+       <Types>
+        <Type Name="Result_BcasResultImportData" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#checkdata()" Kind="Method" Static="False" Accessibility="Public" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="Do not dispose objects multiple times" Category="Microsoft.Usage" CheckId="CA2202" Status="Active" Created="2026-08-11 09:47:52Z" FixCategory="DependsOnFix">
+             <Issue Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\Result" File="BcasResultImportData.aspx.cs" Line="173">Object 'con' can be disposed more than once in method 'Result_BcasResultImportData.checkdata()'. To avoid generating a System.ObjectDisposedException you should not call Dispose more than one time on an object.: Lines: 173</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#RecordCount()" Kind="Method" Static="False" Accessibility="Public" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="Do not dispose objects multiple times" Category="Microsoft.Usage" CheckId="CA2202" Status="Active" Created="2026-08-11 09:47:52Z" FixCategory="DependsOnFix">
+             <Issue Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\Result" File="BcasResultImportData.aspx.cs" Line="219">Object 'con' can be disposed more than once in method 'Result_BcasResultImportData.RecordCount()'. To avoid generating a System.ObjectDisposedException you should not call Dispose more than one time on an object.: Lines: 219</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#Upload(System.Object,System.EventArgs)" Kind="Method" Static="False" Accessibility="Family" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="Do not dispose objects multiple times" Category="Microsoft.Usage" CheckId="CA2202" Status="Active" Created="2026-08-11 09:47:52Z" FixCategory="DependsOnFix">
+             <Issue Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\Result" File="BcasResultImportData.aspx.cs" Line="111">Object 'con' can be disposed more than once in method 'Result_BcasResultImportData.Upload(object, EventArgs)'. To avoid generating a System.ObjectDisposedException you should not call Dispose more than one time on an object.: Lines: 111, 123</Issue>
+             <Issue Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\Result" File="BcasResultImportData.aspx.cs" Line="124">Object 'excel_con' can be disposed more than once in method 'Result_BcasResultImportData.Upload(object, EventArgs)'. To avoid generating a System.ObjectDisposedException you should not call Dispose more than one time on an object.: Lines: 124</Issue>
+            </Message>
+           </Messages>
+          </Member>
+         </Members>
+        </Type>
+        <Type Name="Result_MarksUploaded" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#Upload(System.Object,System.EventArgs)" Kind="Method" Static="False" Accessibility="Family" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="Do not dispose objects multiple times" Category="Microsoft.Usage" CheckId="CA2202" Status="Active" Created="2026-08-11 09:47:52Z" FixCategory="DependsOnFix">
+             <Issue Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\Result" File="MarksUploaded.aspx.cs" Line="103">Object 'con' can be disposed more than once in method 'Result_MarksUploaded.Upload(object, EventArgs)'. To avoid generating a System.ObjectDisposedException you should not call Dispose more than one time on an object.: Lines: 103</Issue>
+             <Issue Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\Result" File="MarksUploaded.aspx.cs" Line="106">Object 'excel_con' can be disposed more than once in method 'Result_MarksUploaded.Upload(object, EventArgs)'. To avoid generating a System.ObjectDisposedException you should not call Dispose more than one time on an object.: Lines: 106</Issue>
+            </Message>
+           </Messages>
+          </Member>
+         </Members>
+        </Type>
+       </Types>
+      </Namespace>
+     </Namespaces>
+    </Module>
+   </Modules>
+  </Target>
+  <Target Name="C:\Users\PRANAV K AGRAWAL\AppData\Local\Temp\tmp40CD.tmp.cadir\bin\App_Web_zmsz2fbv.dll">
+   <Modules>
+    <Module Name="app_web_zmsz2fbv.dll">
+     <Namespaces>
+      <Namespace Name="">
+       <Types>
+        <Type Name="Forms_DetailsForms_ScreenersApplicantDetails" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#drpStates_SelectedIndexChanged(System.Object,System.EventArgs)" Kind="Method" Static="False" Accessibility="Family" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="Do not dispose objects multiple times" Category="Microsoft.Usage" CheckId="CA2202" Status="Active" Created="2026-08-11 09:47:52Z" FixCategory="DependsOnFix">
+             <Issue Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\Forms\DetailsForms" File="ScreenersApplicantDetails.aspx.cs" Line="467">Object 'con' can be disposed more than once in method 'Forms_DetailsForms_ScreenersApplicantDetails.drpStates_SelectedIndexChanged(object, EventArgs)'. To avoid generating a System.ObjectDisposedException you should not call Dispose more than one time on an object.: Lines: 467</Issue>
+            </Message>
+           </Messages>
+          </Member>
+         </Members>
+        </Type>
+       </Types>
+      </Namespace>
+     </Namespaces>
+    </Module>
+   </Modules>
+  </Target>
+  <Target Name="C:\Users\PRANAV K AGRAWAL\AppData\Local\Temp\tmp40CD.tmp.cadir\bin\App_Web_zzihllkq.dll">
+   <Modules>
+    <Module Name="app_web_zzihllkq.dll">
+     <Namespaces>
+      <Namespace Name="">
+       <Types>
+        <Type Name="Forms_DetailsForms_NominationEntryBySOScreeners" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#btnUpdatePayee_Click(System.Object,System.EventArgs)" Kind="Method" Static="False" Accessibility="Family" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="Do not dispose objects multiple times" Category="Microsoft.Usage" CheckId="CA2202" Status="Active" Created="2026-08-11 09:47:52Z" FixCategory="DependsOnFix">
+             <Issue Certainty="75" Level="Warning" Path="d:\BCAS\BCAS_Latest_Deployed_on_Server_2026_August_11\BCASApplication\Forms\DetailsForms" File="NominationEntryBySOScreeners.aspx.cs" Line="291">Object 'objConn' can be disposed more than once in method 'Forms_DetailsForms_NominationEntryBySOScreeners.btnUpdatePayee_Click(object, EventArgs)'. To avoid generating a System.ObjectDisposedException you should not call Dispose more than one time on an object.: Lines: 291</Issue>
+            </Message>
+           </Messages>
+          </Member>
+         </Members>
+        </Type>
+       </Types>
+      </Namespace>
+     </Namespaces>
+    </Module>
+   </Modules>
+  </Target>
+ </Targets>
+ <Rules>
+  <Rule TypeName="Do not dispose objects multiple times" Category="Microsoft.Usage" CheckId="CA2202">
+   <Name>Do not dispose objects multiple times</Name>
+   <Description>A correctly implemented Dispose method can be called multiple times without throwing an exception. However, this is not guaranteed and to avoid generating a System.ObjectDisposedException you should not call Dispose more than one time on an object.</Description>
+   <Resolution Name="Default">Object {0} can be disposed more than once in method {1}. To avoid generating a System.ObjectDisposedException you should not call Dispose more than one time on an object.: Lines: 291</Resolution>
+   <Owner>RuleOwner</Owner>
+   <Url>http://msdn.microsoft.com/library/ms182334.aspx</Url>
+   <Email />
+   <MessageLevel Certainty="75">Warning</MessageLevel>
+   <File Name="dataflowrules.dll" Version="18.0.0.0" />
+  </Rule>
+  <Rule TypeName="MovePInvokesToNativeMethodsClass" Category="Microsoft.Design" CheckId="CA1060">
+   <Name>Move P/Invokes to NativeMethods class</Name>
+   <Description>This type contains members with the DllImport attribute. Members with the DllImport attribute should be contained in classes named NativeMethods, SafeNativeMethods, or UnsafeNativeMethods.</Description>
+   <Resolution Name="Default">Because it is a P/Invoke method, {0} should be defined in a class named NativeMethods, SafeNativeMethods, or UnsafeNativeMethods.</Resolution>
+   <Owner />
+   <Url>http://msdn.microsoft.com/library/ms182161.aspx</Url>
+   <Email>[none]</Email>
+   <MessageLevel Certainty="95">CriticalWarning</MessageLevel>
+   <File Name="designrules.dll" Version="18.0.0.0" />
+  </Rule>
+  <Rule TypeName="RethrowToPreserveStackDetails" Category="Microsoft.Usage" CheckId="CA2200">
+   <Name>Rethrow to preserve stack details</Name>
+   <Description>Use the IL rethrow instruction to preserve original stack details when re-raising a caught exception.</Description>
+   <Resolution Name="Default">{0} rethrows a caught exception and specifies it explicitly as an argument. Use 'throw' without an argument instead, in order to preserve the stack location where the exception was initially raised.</Resolution>
+   <Owner />
+   <Url>http://msdn.microsoft.com/library/ms182363.aspx</Url>
+   <Email>[none]</Email>
+   <MessageLevel Certainty="95">Error</MessageLevel>
+   <File Name="usagerules.dll" Version="18.0.0.0" />
+  </Rule>
+  <Rule TypeName="Review SQL queries for security vulnerabilities" Category="Microsoft.Security" CheckId="CA2100">
+   <Name>Review SQL queries for security vulnerabilities</Name>
+   <Description>A SQL command string built from user input is vulnerable to SQL injection attacks. Microsoft SQL Server and other database servers support stored procedures and parameterized SQL queries, which reduce the risk of injection attacks.</Description>
+   <Resolution Name="WithNonLiterals">The query string passed to {0} in {1} could contain the following variables {2}. If any of these variables could come from user input, consider using a stored procedure or a parameterized SQL query instead of building the query with string concatenations.</Resolution>
+   <Owner>RuleOwner</Owner>
+   <Url>http://msdn.microsoft.com/library/ms182310.aspx</Url>
+   <Email />
+   <MessageLevel Certainty="75">Warning</MessageLevel>
+   <File Name="dataflowrules.dll" Version="18.0.0.0" />
+  </Rule>
+  <Rule TypeName="SpecifyMarshalingForPInvokeStringArguments" Category="Microsoft.Globalization" CheckId="CA2101">
+   <Name>Specify marshaling for P/Invoke string arguments</Name>
+   <Description>When marshaling strings as ANSI (or as Auto on Win9x), some characters may be changed. If best-fit mapping is on, strings that appear different in Unicode will be marshaled to identical ANSI strings, which may lead to incorrect security decisions. Turning best-fit mapping off reduces this risk, as all characters without equivalents are mapped to '?'. Also, note that CharSet.Ansi is the default setting for all string marshaling; Unicode marshaling must be specified explicitly, either as a CharSet setting of DllImport or StructLayout, or as a MarshalAs attribute with a Unicode (or system-dependent) UnmanagedType.</Description>
+   <Resolution Name="Parameter">To reduce security risk, marshal parameter {0} as Unicode, by setting DllImport.CharSet to CharSet.Unicode, or by explicitly marshaling the parameter as UnmanagedType.LPWStr. If you need to marshal this string as ANSI or system-dependent, set BestFitMapping=false; for added security, also set ThrowOnUnmappableChar=true.</Resolution>
+   <Owner />
+   <Url>http://msdn.microsoft.com/library/ms182319.aspx</Url>
+   <Email>[none]</Email>
+   <MessageLevel Certainty="75">Error</MessageLevel>
+   <File Name="globalizationrules.dll" Version="18.0.0.0" />
+  </Rule>
+ </Rules>
+ <Localized>
+  <String Key="Category">Category</String>
+  <String Key="Certainty">Certainty</String>
+  <String Key="CollapseAll">Collapse All</String>
+  <String Key="CheckId">Check Id</String>
+  <String Key="Error">Error</String>
+  <String Key="Errors">error(s)</String>
+  <String Key="ExpandAll">Expand All</String>
+  <String Key="Help">Help</String>
+  <String Key="Line">Line</String>
+  <String Key="Messages">message(s)</String>
+  <String Key="LocationNotStoredInPdb">[Location not stored in Pdb]</String>
+  <String Key="Project">Project</String>
+  <String Key="Resolution">Resolution</String>
+  <String Key="Rule">Rule</String>
+  <String Key="RuleFile">Rule File</String>
+  <String Key="RuleDescription">Rule Description</String>
+  <String Key="Source">Source</String>
+  <String Key="Status">Status</String>
+  <String Key="Target">Target</String>
+  <String Key="Warning">Warning</String>
+  <String Key="Warnings">warning(s)</String>
+  <String Key="ReportTitle">Code Analysis Report</String>
+ </Localized>
+</FxCopReport>

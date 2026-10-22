@@ -126,32 +126,37 @@ public partial class LoggedInHome : System.Web.UI.Page
 
 
                 //LoginStatus.Visible = Convert.ToBoolean(Session["View_Login"].ToString());
-                string UserName = Session["user_id"].ToString();
-                using (DataTable dt = objUserDetails.GetOrganisationType(UserName))
+                // Added null check for user_id session
+                if (Session["user_id"] != null && !string.IsNullOrEmpty(Session["user_id"].ToString()))
                 {
-                    if (dt.Rows.Count > 0)
+                    string UserName = Session["user_id"].ToString();
+                    using (DataTable dt = objUserDetails.GetOrganisationType(UserName))
                     {
-                        if (dt.Rows[0]["Organisation_Type"].ToString() == "P")
+                        if (dt.Rows.Count > 0)
                         {
-
-                            using (DataTable new_dt = objUserDetails.GetUserOrganisationPayee(UserName))
+                            if (dt.Rows[0]["Organisation_Type"].ToString() == "P")
                             {
-                                if (new_dt.Rows.Count > 0)
+
+                                using (DataTable new_dt = objUserDetails.GetUserOrganisationPayee(UserName))
                                 {
-                                    Session["UserOrg"] = new_dt.Rows[0]["Payee_Organisation_Code"].ToString();
-                                    Session["OrgName"] = new_dt.Rows[0]["Payee_Organisation_Name"].ToString();
+                                    if (new_dt.Rows.Count > 0)
+                                    {
+                                        Session["UserOrg"] = new_dt.Rows[0]["Payee_Organisation_Code"].ToString();
+                                        Session["OrgName"] = new_dt.Rows[0]["Payee_Organisation_Name"].ToString();
+                                    }
                                 }
                             }
-                        }
-                        else
-                        {
-                            using (DataTable new_dt1 = objUserDetails.getUserOrganisation(UserName))
+                            else
                             {
-                                if (new_dt1.Rows.Count > 0)
+                                using (DataTable new_dt1 = objUserDetails.getUserOrganisation(UserName))
                                 {
-                                    Session["UserOrg"] = new_dt1.Rows[0]["Organisation_Code"].ToString();
+                                    if (new_dt1.Rows.Count > 0)
+                                    {
+                                        Session["UserOrg"] = new_dt1.Rows[0]["Organisation_Code"].ToString();
 
-                                    Session["OrgName"] = new_dt1.Rows[0]["Organisation_Name"].ToString();
+                                        Session["OrgName"] = new_dt1.Rows[0]["Organisation_Name"].ToString();
+
+                                    }
 
                                 }
 
@@ -160,15 +165,14 @@ public partial class LoggedInHome : System.Web.UI.Page
                         }
 
                     }
-
-
-
-                   
-
-
                 }
-               
-            }          
+                else
+                {
+                    // If user_id session is not set, redirect to home
+                    Response.Redirect("~/Home.aspx");
+                }
+
+            }
            
         }
 
