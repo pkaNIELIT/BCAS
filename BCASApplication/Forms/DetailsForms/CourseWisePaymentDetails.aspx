@@ -38,6 +38,17 @@
             width: 65%;
             text-align: left;
         }
+        .verify-btn
+        {
+            color: #FFFFFF !important;
+            font-weight: bold;
+            min-width: 110px;
+            padding: 3px 8px;
+            border: 1px solid #333333;
+            cursor: pointer;
+        }
+        .verify-no  { background-color: #CC0000 !important; }
+        .verify-yes { background-color: #008000 !important; }
     </style>
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" Runat="Server">
@@ -68,6 +79,8 @@
                         <td>&nbsp;</td>
                         <td class="payment-field">
                             <asp:Button ID="btnClear" runat="server" CausesValidation="False" ForeColor="#000099" Text="Clear" OnClick="btnClear_Click" />
+                            &nbsp;
+                            <asp:Button ID="btnExportExcel" runat="server" CausesValidation="False" ForeColor="#000099" Text="Download Excel" OnClick="btnExportExcel_Click" />
                         </td>
                     </tr>
                     <tr>
@@ -97,11 +110,27 @@
                         <asp:BoundField DataField="ProformaInvoiceNo" HeaderText="Proforma Invoice No." SortExpression="ProformaInvoiceNo" />
                         <asp:BoundField DataField="Transaction_id" HeaderText="Transaction ID" SortExpression="Transaction_id" />
                         <asp:BoundField DataField="Reference_No" HeaderText="Reference No." SortExpression="Reference_No" />
+                        <asp:BoundField DataField="NoOfCandidates" HeaderText="Number of Candidates" SortExpression="No_of_candidates" />
                         <asp:BoundField DataField="Amount_Recieved" HeaderText="Amount" SortExpression="Amount_Recieved" />
                         <asp:BoundField DataField="PaymentDate" HeaderText="Payment Date" SortExpression="PaymentDate" />
                         <asp:BoundField DataField="PaymentTime" HeaderText="Payment Time" SortExpression="PaymentTime" />
                         <asp:BoundField DataField="Payment_Status" HeaderText="Payment Status" SortExpression="Payment_Status" />
                         <asp:BoundField DataField="ResponseDescription" HeaderText="Payment Description" SortExpression="ResponseDescription" />
+                        <asp:BoundField DataField="GST_No" HeaderText="Payee GST Number" SortExpression="GST_Number" />
+                        <asp:BoundField DataField="Pin_Code" HeaderText="Payee Pin Code" SortExpression="Payee_Pincode" />
+                        <asp:BoundField DataField="Complete_Address" HeaderText="Payee Address" SortExpression="Payee_Address" />
+                        <asp:TemplateField HeaderText="Verify Exam Details">
+                            <ItemTemplate>
+                                <asp:CheckBox ID="chkVerified" runat="server" AutoPostBack="True"
+                                    Checked='<%# IsVerified(Eval("Exam_Details_Verified")) %>'
+                                    OnCheckedChanged="chkVerified_CheckedChanged" CausesValidation="False" />
+                                <asp:Button ID="btnVerify" runat="server" CausesValidation="False"
+                                    CommandName="ToggleVerify" CommandArgument='<%# Eval("Transaction_id") %>'
+                                    Text='<%# IsVerified(Eval("Exam_Details_Verified")) ? "Verified" : "Not Verified" %>'
+                                    CssClass='<%# IsVerified(Eval("Exam_Details_Verified")) ? "verify-btn verify-yes" : "verify-btn verify-no" %>' />
+                            </ItemTemplate>
+                            <ItemStyle HorizontalAlign="Center" Wrap="False" />
+                        </asp:TemplateField>
                     </Columns>
                     <FooterStyle BackColor="#990000" />
                     <HeaderStyle BackColor="#990000" ForeColor="White" />

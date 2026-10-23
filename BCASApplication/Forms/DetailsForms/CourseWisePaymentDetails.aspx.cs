@@ -3,15 +3,18 @@ using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.Globalization;
+using System.Text;
 using System.Web;
 using System.Web.Security;
 using System.Web.UI.WebControls;
 using BCASClassLibrary;
+using System.Web.UI;
 
 public partial class Forms_DetailsForms_CourseWisePaymentDetails : System.Web.UI.Page
 {
     private const string PaymentDetailsViewStateKey = "CourseWisePaymentDetails";
     private readonly TYP_PayeeOrganisationPayment objPay = new TYP_PayeeOrganisationPayment();
+    private bool _exportingExcel = false;
 
     protected void Page_Load(object sender, EventArgs e)
     {
@@ -26,6 +29,16 @@ public partial class Forms_DetailsForms_CourseWisePaymentDetails : System.Web.UI
             grdPaymentDetails.Visible = false;
             pnlReceipt.Visible = false;
         }
+    }
+
+    protected override void Render(HtmlTextWriter writer)
+    {
+        if (_exportingExcel)
+        {
+            return;
+        }
+
+        base.Render(writer);
     }
 
     protected void btnSearch_Click(object sender, EventArgs e)
@@ -51,6 +64,20 @@ public partial class Forms_DetailsForms_CourseWisePaymentDetails : System.Web.UI
         ViewState[PaymentDetailsViewStateKey] = null;
     }
 
+    protected void btnExportExcel_Click(object sender, EventArgs e)
+    {
+        lbl_ErrorMsg.Text = string.Empty;
+
+        DataTable paymentDetails = ViewState[PaymentDetailsViewStateKey] as DataTable;
+        if (paymentDetails == null || paymentDetails.Rows.Count == 0)
+        {
+            lbl_ErrorMsg.Text = "No records available to export. Please search payment details first.";
+            return;
+        }
+
+        ExportPaymentDetailsToExcel(paymentDetails);
+    }
+
     protected void grdPaymentDetails_PageIndexChanging(object sender, GridViewPageEventArgs e)
     {
         grdPaymentDetails.PageIndex = e.NewPageIndex;
@@ -60,7 +87,7 @@ public partial class Forms_DetailsForms_CourseWisePaymentDetails : System.Web.UI
 
     protected void grdPaymentDetails_RowCommand(object sender, GridViewCommandEventArgs e)
     {
-        if (e.CommandName != "ShowReceipt")
+        if (e.CommandName != "ShowReceipt" && e.CommandName != "ToggleVerify")
         {
             return;
         }
@@ -73,6 +100,16 @@ public partial class Forms_DetailsForms_CourseWisePaymentDetails : System.Web.UI
         }
 
         string transactionId = Convert.ToString(e.CommandArgument);
+
+        if (e.CommandName == "ToggleVerify")
+        {
+            // Button click: flip the current state
+            DataRow current = FindPaymentRow(paymentDetails, transactionId);
+            bool newState = current == null || !IsVerified(current["Exam_Details_Verified"]);
+            SetExamVerification(transactionId, newState);
+            return;
+        }
+
         DataRow receiptRow = null;
         foreach (DataRow row in paymentDetails.Rows)
         {
@@ -90,6 +127,83 @@ public partial class Forms_DetailsForms_CourseWisePaymentDetails : System.Web.UI
         }
 
         ShowReceipt(receiptRow);
+    }
+
+    // Checkbox click: set state to whatever the checkbox now shows
+    protected void chkVerified_CheckedChanged(object sender, EventArgs e)
+    {
+        CheckBox chk = (CheckBox)sender;
+        GridViewRow row = (GridViewRow)chk.NamingContainer;
+        string transactionId = Convert.ToString(grdPaymentDetails.DataKeys[row.RowIndex].Value);
+        SetExamVerification(transactionId, chk.Checked);
+    }
+
+    protected bool IsVerified(object value)
+    {
+        if (value == null || value == DBNull.Value)
+        {
+            return false;
+        }
+
+        bool result;
+        return bool.TryParse(Convert.ToString(value), out result) && result;
+    }
+
+    private DataRow FindPaymentRow(DataTable paymentDetails, string transactionId)
+    {
+        foreach (DataRow row in paymentDetails.Rows)
+        {
+            if (Convert.ToString(row["Transaction_id"]) == transactionId)
+            {
+                return row;
+            }
+        }
+
+        return null;
+    }
+
+    private void SetExamVerification(string transactionId, bool verified)
+    {
+        lbl_ErrorMsg.Text = string.Empty;
+
+        DataTable paymentDetails = ViewState[PaymentDetailsViewStateKey] as DataTable;
+        if (paymentDetails == null)
+        {
+            lbl_ErrorMsg.Text = "Please search payment details again.";
+            return;
+        }
+
+        // Only rows already returned (and role-filtered) for this user can be changed
+        DataRow row = FindPaymentRow(paymentDetails, transactionId);
+        if (row == null)
+        {
+            lbl_ErrorMsg.Text = "The selected payment was not found. Please search again.";
+            return;
+        }
+
+        try
+        {
+            string connectionString = ConfigurationManager.ConnectionStrings["BCASConnectionString"].ConnectionString;
+            using (SqlConnection con = new SqlConnection(connectionString))
+            using (SqlCommand cmd = new SqlCommand("dbo.UpdateExamDetailsVerification", con))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@TransactionId", transactionId);
+                cmd.Parameters.AddWithValue("@IsVerified", verified);
+                cmd.Parameters.AddWithValue("@VerifiedBy", Convert.ToString(Session["UserId"]));
+                con.Open();
+                cmd.ExecuteNonQuery();
+            }
+        }
+        catch (Exception)
+        {
+            lbl_ErrorMsg.Text = "Unable to update verification status. Please try again.";
+            return;
+        }
+
+        row["Exam_Details_Verified"] = verified;
+        ViewState[PaymentDetailsViewStateKey] = paymentDetails;
+        BindGrid(paymentDetails);
     }
 
     private void BindCourseSchedules()
@@ -122,6 +236,7 @@ ORDER BY Course_Schedule.Schedule_ID DESC", con))
 
         using (DataTable paymentDetails = objPay.GetCourseWisePaymentDetails(roleName, organisationCode, scheduleId, fromDate, toDate))
         {
+            NormalizePaymentDetailColumns(paymentDetails);
             AddDisplayDateColumns(paymentDetails);
             ViewState[PaymentDetailsViewStateKey] = paymentDetails.Copy();
             BindGrid(paymentDetails);
@@ -159,6 +274,40 @@ ORDER BY Course_Schedule.Schedule_ID DESC", con))
             DateTime paymentDate = Convert.ToDateTime(row["Date_of_Payment"]);
             row["PaymentDate"] = paymentDate.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture);
             row["PaymentTime"] = paymentDate.ToString("hh:mm:ss tt", CultureInfo.InvariantCulture);
+        }
+    }
+
+    private void NormalizePaymentDetailColumns(DataTable paymentDetails)
+    {
+        if (!paymentDetails.Columns.Contains("Exam_Details_Verified"))
+        {
+            paymentDetails.Columns.Add("Exam_Details_Verified", typeof(bool));
+        }
+
+        EnsureDisplayColumn(paymentDetails, "GST_Number", "GST_No");
+        EnsureDisplayColumn(paymentDetails, "Payee_Pincode", "Pin_Code");
+        EnsureDisplayColumn(paymentDetails, "Payee_Address", "Complete_Address");
+        EnsureDisplayColumn(paymentDetails, "No_of_candidates", "NoOfCandidates");
+    }
+
+    private static void EnsureDisplayColumn(DataTable paymentDetails, string sourceColumnName, string displayColumnName)
+    {
+        if (!paymentDetails.Columns.Contains(displayColumnName))
+        {
+            paymentDetails.Columns.Add(displayColumnName, typeof(string));
+        }
+
+        bool sourceColumnExists = paymentDetails.Columns.Contains(sourceColumnName);
+        foreach (DataRow row in paymentDetails.Rows)
+        {
+            if (sourceColumnExists && row[sourceColumnName] != DBNull.Value)
+            {
+                row[displayColumnName] = Convert.ToString(row[sourceColumnName]);
+            }
+            else if (row[displayColumnName] == DBNull.Value)
+            {
+                row[displayColumnName] = string.Empty;
+            }
         }
     }
 
@@ -228,6 +377,104 @@ ORDER BY Course_Schedule.Schedule_ID DESC", con))
         lblReceiptStatus.Text = GetColumnValue(receiptRow, "Payment_Status");
         lblReceiptDescription.Text = GetColumnValue(receiptRow, "ResponseDescription");
         pnlReceipt.Visible = true;
+    }
+
+    private void ExportPaymentDetailsToExcel(DataTable paymentDetails)
+    {
+        string[] columns = new[]
+        {
+            "Course_Name",
+            "CourseSchedule",
+            "Sponsoring_Organisation",
+            "Payee_Organisation_Name",
+            "ProformaInvoiceNo",
+            "Transaction_id",
+            "Reference_No",
+            "NoOfCandidates",
+            "Amount_Recieved",
+            "PaymentDate",
+            "PaymentTime",
+            "Payment_Status",
+            "ResponseDescription",
+            "GST_No",
+            "Pin_Code",
+            "Complete_Address"
+        };
+
+        string[] headers = new[]
+        {
+            "Course",
+            "Course Schedule",
+            "Sponsoring Organisation",
+            "Payee Organisation",
+            "Proforma Invoice No.",
+            "Transaction ID",
+            "Reference No.",
+            "No. of Candidates",
+            "Amount",
+            "Payment Date",
+            "Payment Time",
+            "Payment Status",
+            "Payment Description",
+            "GST No.",
+            "Pin Code",
+            "Complete Address"
+        };
+
+        StringBuilder content = new StringBuilder();
+        int index;
+        for (index = 0; index < headers.Length; index++)
+        {
+            content.Append(headers[index]);
+            if (index < headers.Length - 1)
+            {
+                content.Append('\t');
+            }
+        }
+
+        content.AppendLine();
+
+        foreach (DataRow row in paymentDetails.Rows)
+        {
+            for (index = 0; index < columns.Length; index++)
+            {
+                content.Append(SanitizeExcelValue(GetColumnValue(row, columns[index])));
+                if (index < columns.Length - 1)
+                {
+                    content.Append('\t');
+                }
+            }
+
+            content.AppendLine();
+        }
+
+        string fileName = "CourseWisePaymentDetails_" + DateTime.Now.ToString("yyyyMMddHHmmss", CultureInfo.InvariantCulture) + ".xls";
+
+        Response.Clear();
+        Response.Buffer = true;
+        Response.Charset = string.Empty;
+        Response.ContentType = "application/vnd.ms-excel";
+        Response.AppendHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
+        Response.Write(content.ToString());
+        //Response.Flush();
+        _exportingExcel = true;
+        HttpContext.Current.ApplicationInstance.CompleteRequest();
+    }
+
+    private static string SanitizeExcelValue(string value)
+    {
+        if (string.IsNullOrEmpty(value))
+        {
+            return string.Empty;
+        }
+
+        string cleanedValue = value.Replace("\r", " ").Replace("\n", " ").Replace("\t", " ");
+        if (cleanedValue.StartsWith("=") || cleanedValue.StartsWith("+") || cleanedValue.StartsWith("-") || cleanedValue.StartsWith("@"))
+        {
+            cleanedValue = "'" + cleanedValue;
+        }
+
+        return cleanedValue;
     }
 
     private string GetColumnValue(DataRow row, string columnName)
