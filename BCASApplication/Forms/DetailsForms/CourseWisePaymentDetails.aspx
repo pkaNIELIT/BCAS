@@ -156,8 +156,8 @@
                                 <asp:LinkButton ID="lnkSelectCandidates" runat="server" CausesValidation="False"
                                     CommandName="SelectCandidates" CommandArgument='<%# Eval("Transaction_id") %>'
                                     Text='<%# GetCandidateButtonText(Eval("Candidates_Selected"), Eval("NoOfCandidates")) %>'
-                                    Enabled='<%# !IsFinanceUser && IsVerified(Eval("Exam_Details_Verified")) %>'
-                                    ToolTip="Verify exam details first, then choose candidates"></asp:LinkButton>
+                                    Enabled='<%# IsVerified(Eval("Exam_Details_Verified")) %>'
+                                    ToolTip="Select / view the candidates sent for verification (works after the payment is Verified)"></asp:LinkButton>
                             </ItemTemplate>
                             <ItemStyle HorizontalAlign="Center" Wrap="False" />
                         </asp:TemplateField>
@@ -254,7 +254,7 @@
 <%--
 =====================================================================
  STORY OF THIS PAGE (explained like you are 10 years old)
- Last updated: 19 Nov 2026 (FINAL version)
+ Last updated: 19 Nov 2026 (SERVER version)
 =====================================================================
 
  WHAT THIS PAGE IS
@@ -265,46 +265,31 @@
  ------------------------
  1. Column "Verify Exam Details": checkbox + button.
     Red "Not Verified" -> click -> Green "Verified" (click again = red).
- 2. FINANCE can only LOOK (greyed-out controls), and the database shows
-    finance only the Verified payments.
- 3. The first SQL (3 new columns, UpdateExamDetailsVerification, finance
-    filter, FINANCE role key) was run on the live database.
+ 2. FINANCE can only LOOK (greyed-out controls) and sees only the
+    Verified payments.
+ 3. "Number of Candidates" is a link: click = Excel with all details of the
+    candidates of that payment.
+ 4. Column "Verify Candidates": after "Verified", click "Select Candidates
+    (5/10)", tick the candidates and press "Save Selected Candidates".
 
- WHAT WE DID NOW (FINAL)
- -----------------------
- 1. "Number of Candidates" is a link. Click = Excel with ALL details of
-    the candidates of that payment (name, registration no, DOB, mobile,
-    Aadhaar, organisation, nomination and fee details ...).
-    The details come from 3 tables: NOMINATIONS_FOR_COURSES (who was
-    nominated) + Candidate_Registration + Candidate_Registration_Screeners
-    (who the person is). The SQL handles the different column names
-    (Registration_No vs Registration_Number).
- 2. New column "Verify Candidates" ("Select Candidates (5/10)"). It wakes up
-    only AFTER the payment is "Verified". Click it -> a box with every
-    candidate and a checkbox. Tick the ones to send for verification
-    (e.g. 5 out of 10) and press "Save Selected Candidates".
-    Select All / Clear All / Download Excel / Close buttons are in the box.
- 3. Finance cannot tick anything. Finance's candidate Excel contains ONLY
-    the ticked candidates. Admin / Payee / Sponsoring see all candidates.
- 4. Only these two page files changed - BCASClassLibrary is untouched.
+ WHAT WE DID NOW (SERVER VERSION)
+ --------------------------------
+ 1. FINANCE can now open the link, which reads "View Candidates (2/4)"
+    for finance. They see ONLY the ticked candidates (2 of 4), with only
+    "Download Excel" and "Close". No tick-boxes, no Select All, no Save.
+ 2. Behind the page, the .aspx.cs now uses its own plain SQL instead of
+    new stored procedures (the server does not use them). Nothing you see
+    on this page changed because of that.
 
  WHAT IS LEFT TO DO
  ------------------
- 1. Take a backup, then run CourseWisePaymentDetails_FINAL_LiveDB_Script.sql
-    on the LIVE database BEFORE uploading these page files.
- 2. Run the checks at the bottom of that SQL file. Check (b) must return NO
-    rows (it means the candidates found = Number of Candidates on every
-    invoice). If it returns rows, the link between invoice and nominations
-    needs a small fix - tell the developer.
- 3. Test with 3 logins: admin, a payee/sponsoring user, finadmin.
+ 1. Run the small SQL script on the server database, then upload this
+    .aspx and the .aspx.cs file.
+ 2. Test with 3 logins: admin, payee/sponsoring, finadmin.
+ 3. Old payments start as "Not Verified", so finance sees nothing until
+    somebody verifies payments.
  4. Ask Varun sir: if a payment goes back to "Not Verified", should the
     ticked candidates be cleared? (Now they are kept.)
- 5. Later idea: show names instead of codes (Sex_Code, Designation_Code,
-    Nationality_Code, Qualification_Code) in the Excel by joining the
-    master tables.
+ 5. Later idea: names instead of codes (gender, designation ...) in Excel.
 =====================================================================
-
-
-
-
 --%>
