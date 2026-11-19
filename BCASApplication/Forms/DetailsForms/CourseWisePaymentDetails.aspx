@@ -136,7 +136,7 @@
                         <asp:BoundField DataField="GST_No" HeaderText="Payee GST Number" SortExpression="GST_Number" />
                         <asp:BoundField DataField="Pin_Code" HeaderText="Payee Pin Code" SortExpression="Payee_Pincode" />
                         <asp:BoundField DataField="Complete_Address" HeaderText="Payee Address" SortExpression="Payee_Address" />
-                        <asp:TemplateField HeaderText="Verify Exam Details">
+                        <asp:TemplateField HeaderText="Not Verified / Verified Status">
                             <ItemTemplate>
                                 <asp:CheckBox ID="chkVerified" runat="server" AutoPostBack="True"
                                     Checked='<%# IsVerified(Eval("Exam_Details_Verified")) %>'
@@ -303,4 +303,8 @@
     Nationality_Code, Qualification_Code) in the Excel by joining the
     master tables.
 =====================================================================
+
+
+
+
 --%>
