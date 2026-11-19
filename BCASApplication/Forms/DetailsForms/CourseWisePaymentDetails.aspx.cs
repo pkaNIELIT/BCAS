@@ -15,6 +15,20 @@ public partial class Forms_DetailsForms_CourseWisePaymentDetails : System.Web.UI
     private const string PaymentDetailsViewStateKey = "CourseWisePaymentDetails";
     private readonly TYP_PayeeOrganisationPayment objPay = new TYP_PayeeOrganisationPayment();
     private bool _exportingExcel = false;
+    private bool? _isFinanceUser = null;   // remembers the answer so we ask "is this finance?" only once
+
+    // True when the logged-in person is FINANCE (they may only LOOK, not verify)
+    protected bool IsFinanceUser
+    {
+        get
+        {
+            if (!_isFinanceUser.HasValue)
+            {
+                _isFinanceUser = GetPaymentRoleName().Contains("FINANCE");
+            }
+            return _isFinanceUser.Value;
+        }
+    }
 
     protected void Page_Load(object sender, EventArgs e)
     {
@@ -52,6 +66,7 @@ public partial class Forms_DetailsForms_CourseWisePaymentDetails : System.Web.UI
     {
         lbl_ErrorMsg.Text = string.Empty;
         pnlReceipt.Visible = false;
+        pnlCandidates.Visible = false;
         BindPaymentDetails(null, null);
     }
 
@@ -61,6 +76,7 @@ public partial class Forms_DetailsForms_CourseWisePaymentDetails : System.Web.UI
         lbl_ErrorMsg.Text = string.Empty;
         grdPaymentDetails.Visible = false;
         pnlReceipt.Visible = false;
+        pnlCandidates.Visible = false;
         ViewState[PaymentDetailsViewStateKey] = null;
     }
 
@@ -87,7 +103,7 @@ public partial class Forms_DetailsForms_CourseWisePaymentDetails : System.Web.UI
 
     protected void grdPaymentDetails_RowCommand(object sender, GridViewCommandEventArgs e)
     {
-        if (e.CommandName != "ShowReceipt" && e.CommandName != "ToggleVerify")
+        if (e.CommandName != "ShowReceipt" && e.CommandName != "ToggleVerify" && e.CommandName != "DownloadCandidates" && e.CommandName != "SelectCandidates")
         {
             return;
         }
@@ -100,6 +116,18 @@ public partial class Forms_DetailsForms_CourseWisePaymentDetails : System.Web.UI
         }
 
         string transactionId = Convert.ToString(e.CommandArgument);
+
+        if (e.CommandName == "DownloadCandidates")
+        {
+            DownloadCandidatesExcel(paymentDetails, transactionId);
+            return;
+        }
+
+        if (e.CommandName == "SelectCandidates")
+        {
+            OpenCandidatePanel(paymentDetails, transactionId);
+            return;
+        }
 
         if (e.CommandName == "ToggleVerify")
         {
@@ -145,8 +173,9 @@ public partial class Forms_DetailsForms_CourseWisePaymentDetails : System.Web.UI
             return false;
         }
 
+        string text = Convert.ToString(value);
         bool result;
-        return bool.TryParse(Convert.ToString(value), out result) && result;
+        return text == "1" || (bool.TryParse(text, out result) && result);
     }
 
     private DataRow FindPaymentRow(DataTable paymentDetails, string transactionId)
@@ -165,6 +194,13 @@ public partial class Forms_DetailsForms_CourseWisePaymentDetails : System.Web.UI
     private void SetExamVerification(string transactionId, bool verified)
     {
         lbl_ErrorMsg.Text = string.Empty;
+
+        // Safety lock: finance can never change verification, even if someone fakes a click
+        if (IsFinanceUser)
+        {
+            lbl_ErrorMsg.Text = "Finance users can only view verified payments.";
+            return;
+        }
 
         DataTable paymentDetails = ViewState[PaymentDetailsViewStateKey] as DataTable;
         if (paymentDetails == null)
@@ -188,9 +224,10 @@ public partial class Forms_DetailsForms_CourseWisePaymentDetails : System.Web.UI
             using (SqlCommand cmd = new SqlCommand("dbo.UpdateExamDetailsVerification", con))
             {
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@TransactionId", transactionId);
-                cmd.Parameters.AddWithValue("@IsVerified", verified);
-                cmd.Parameters.AddWithValue("@VerifiedBy", Convert.ToString(Session["UserId"]));
+                // Transaction_id is an INT in Online_Transaction, so we send an INT
+                cmd.Parameters.Add("@TransactionId", SqlDbType.Int).Value = Convert.ToInt32(transactionId);
+                cmd.Parameters.Add("@IsVerified", SqlDbType.Bit).Value = verified;
+                cmd.Parameters.Add("@VerifiedBy", SqlDbType.VarChar, 100).Value = Convert.ToString(Session["UserId"]);
                 con.Open();
                 cmd.ExecuteNonQuery();
             }
@@ -204,6 +241,293 @@ public partial class Forms_DetailsForms_CourseWisePaymentDetails : System.Web.UI
         row["Exam_Details_Verified"] = verified;
         ViewState[PaymentDetailsViewStateKey] = paymentDetails;
         BindGrid(paymentDetails);
+    }
+
+    // Text shown on the "Verify Candidates" link, e.g. "Select Candidates (5/10)"
+    protected string GetCandidateButtonText(object selected, object total)
+    {
+        int s = 0, t = 0;
+        Int32.TryParse(Convert.ToString(selected), out s);
+        Int32.TryParse(Convert.ToString(total), out t);
+        return "Select Candidates (" + s + "/" + t + ")";
+    }
+
+    // Asks the database for the candidates of one payment.
+    // Finance gets ONLY the ticked candidates, everybody else gets all of them.
+    // Returned table has: Candidate_ID, ...details..., Is_Selected (bit)
+    private DataTable LoadCandidates(string transactionId)
+    {
+        DataTable candidates = new DataTable();
+        string connectionString = ConfigurationManager.ConnectionStrings["BCASConnectionString"].ConnectionString;
+        using (SqlConnection con = new SqlConnection(connectionString))
+        using (SqlCommand cmd = new SqlCommand("dbo.GetCandidatesByTransaction", con))
+        {
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.Add("@TransactionId", SqlDbType.Int).Value = Convert.ToInt32(transactionId);
+            cmd.Parameters.Add("@OnlyVerified", SqlDbType.Bit).Value = IsFinanceUser;
+            using (SqlDataAdapter adapter = new SqlDataAdapter(cmd))
+            {
+                adapter.Fill(candidates);
+            }
+        }
+        return candidates;
+    }
+
+    // Click on "Number of Candidates" -> Excel with ALL details of those candidates
+    private void DownloadCandidatesExcel(DataTable paymentDetails, string transactionId)
+    {
+        lbl_ErrorMsg.Text = string.Empty;
+
+        // Only payments already shown to this user (role-filtered) can be downloaded
+        if (FindPaymentRow(paymentDetails, transactionId) == null)
+        {
+            lbl_ErrorMsg.Text = "The selected payment was not found. Please search again.";
+            return;
+        }
+
+        DataTable candidates;
+        try
+        {
+            candidates = LoadCandidates(transactionId);
+        }
+        catch (Exception)
+        {
+            lbl_ErrorMsg.Text = "Unable to load candidate details. Please contact the administrator.";
+            return;
+        }
+
+        if (candidates.Rows.Count == 0)
+        {
+            lbl_ErrorMsg.Text = IsFinanceUser
+                ? "No candidates have been selected for verification for this payment."
+                : "No candidate details found for this payment.";
+            return;
+        }
+
+        ExportAnyTableToExcel(candidates, "Candidates_Txn" + transactionId);
+    }
+
+    // ---------------- STEP 2: choose candidates ----------------
+
+    // Opens the box that lists the candidates with a checkbox each
+    private void OpenCandidatePanel(DataTable paymentDetails, string transactionId)
+    {
+        lbl_ErrorMsg.Text = string.Empty;
+        lblCandMsg.Text = string.Empty;
+
+        if (IsFinanceUser)
+        {
+            lbl_ErrorMsg.Text = "Finance users cannot select candidates.";
+            return;
+        }
+
+        DataRow payment = FindPaymentRow(paymentDetails, transactionId);
+        if (payment == null)
+        {
+            lbl_ErrorMsg.Text = "The selected payment was not found. Please search again.";
+            return;
+        }
+
+        // step 1 must be finished first
+        if (!IsVerified(payment["Exam_Details_Verified"]))
+        {
+            lbl_ErrorMsg.Text = "Please verify the exam details first, then select candidates.";
+            return;
+        }
+
+        try
+        {
+            BindCandidateGrid(transactionId);
+        }
+        catch (Exception)
+        {
+            pnlCandidates.Visible = false;
+            lbl_ErrorMsg.Text = "Unable to load candidate details. Please contact the administrator.";
+            return;
+        }
+
+        ViewState["CandidateTxnId"] = transactionId;
+        lblCandTitle.Text = "Select candidates for Transaction ID " + transactionId
+            + " (" + GetColumnValue(payment, "Course_Name") + ")";
+        pnlCandidates.Visible = true;
+    }
+
+    private void BindCandidateGrid(string transactionId)
+    {
+        DataTable candidates = LoadCandidates(transactionId);
+
+        // remember who is already ticked, then hide that helper column from the screen
+        System.Collections.Generic.HashSet<string> ticked = new System.Collections.Generic.HashSet<string>();
+        foreach (DataRow r in candidates.Rows)
+        {
+            if (candidates.Columns.Contains("Is_Selected") && IsVerified(r["Is_Selected"]))
+            {
+                ticked.Add(Convert.ToString(r["Candidate_ID"]));
+            }
+        }
+        if (candidates.Columns.Contains("Is_Selected"))
+        {
+            candidates.Columns.Remove("Is_Selected");
+        }
+
+        grdCandidates.DataSource = candidates;
+        grdCandidates.DataBind();
+
+        foreach (GridViewRow row in grdCandidates.Rows)
+        {
+            CheckBox chk = (CheckBox)row.FindControl("chkCand");
+            chk.Checked = ticked.Contains(Convert.ToString(grdCandidates.DataKeys[row.RowIndex].Value));
+        }
+    }
+
+    protected void btnCandSelectAll_Click(object sender, EventArgs e)
+    {
+        SetAllCandidateCheckboxes(true);
+    }
+
+    protected void btnCandClearAll_Click(object sender, EventArgs e)
+    {
+        SetAllCandidateCheckboxes(false);
+    }
+
+    private void SetAllCandidateCheckboxes(bool value)
+    {
+        foreach (GridViewRow row in grdCandidates.Rows)
+        {
+            ((CheckBox)row.FindControl("chkCand")).Checked = value;
+        }
+    }
+
+    protected void btnCandClose_Click(object sender, EventArgs e)
+    {
+        pnlCandidates.Visible = false;
+        lblCandMsg.Text = string.Empty;
+    }
+
+    // Excel of the candidates for the payment shown in the box
+    protected void btnCandDownload_Click(object sender, EventArgs e)
+    {
+        DataTable paymentDetails = ViewState[PaymentDetailsViewStateKey] as DataTable;
+        string transactionId = Convert.ToString(ViewState["CandidateTxnId"]);
+        if (paymentDetails == null || transactionId.Length == 0)
+        {
+            lbl_ErrorMsg.Text = "Please search payment details again.";
+            return;
+        }
+
+        DownloadCandidatesExcel(paymentDetails, transactionId);
+    }
+
+    // Save the ticked candidates
+    protected void btnCandSave_Click(object sender, EventArgs e)
+    {
+        lbl_ErrorMsg.Text = string.Empty;
+        lblCandMsg.Text = string.Empty;
+
+        if (IsFinanceUser)
+        {
+            lbl_ErrorMsg.Text = "Finance users cannot select candidates.";
+            return;
+        }
+
+        DataTable paymentDetails = ViewState[PaymentDetailsViewStateKey] as DataTable;
+        string transactionId = Convert.ToString(ViewState["CandidateTxnId"]);
+        DataRow payment = paymentDetails == null ? null : FindPaymentRow(paymentDetails, transactionId);
+        if (payment == null || !IsVerified(payment["Exam_Details_Verified"]))
+        {
+            lbl_ErrorMsg.Text = "Please search again and verify the exam details first.";
+            return;
+        }
+
+        // collect the ticked candidates
+        DataTable ids = new DataTable();
+        ids.Columns.Add("Candidate_ID", typeof(string));
+        System.Collections.Generic.HashSet<string> added = new System.Collections.Generic.HashSet<string>();
+        foreach (GridViewRow row in grdCandidates.Rows)
+        {
+            CheckBox chk = (CheckBox)row.FindControl("chkCand");
+            string candidateId = Convert.ToString(grdCandidates.DataKeys[row.RowIndex].Value);
+            // the same candidate is sent only once
+            if (chk != null && chk.Checked && added.Add(candidateId))
+            {
+                ids.Rows.Add(candidateId);
+            }
+        }
+
+        try
+        {
+            string connectionString = ConfigurationManager.ConnectionStrings["BCASConnectionString"].ConnectionString;
+            using (SqlConnection con = new SqlConnection(connectionString))
+            using (SqlCommand cmd = new SqlCommand("dbo.SaveVerifiedCandidates", con))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.Add("@TransactionId", SqlDbType.Int).Value = Convert.ToInt32(transactionId);
+                cmd.Parameters.Add("@VerifiedBy", SqlDbType.VarChar, 100).Value = Convert.ToString(Session["UserId"]);
+                SqlParameter list = cmd.Parameters.Add("@Candidates", SqlDbType.Structured);
+                list.TypeName = "dbo.CandidateIdList";
+                list.Value = ids;
+                con.Open();
+                cmd.ExecuteNonQuery();
+            }
+        }
+        catch (SqlException ex)
+        {
+            // 50000 = a message written on purpose in our own procedure
+            lbl_ErrorMsg.Text = ex.Number == 50000 ? ex.Message : "Unable to save selected candidates. Please try again.";
+            return;
+        }
+        catch (Exception)
+        {
+            lbl_ErrorMsg.Text = "Unable to save selected candidates. Please try again.";
+            return;
+        }
+
+        // update the number shown on the main grid
+        payment["Candidates_Selected"] = ids.Rows.Count;
+        ViewState[PaymentDetailsViewStateKey] = paymentDetails;
+        BindGrid(paymentDetails);
+
+        lblCandMsg.Text = ids.Rows.Count + " candidate(s) saved for verification.";
+    }
+
+    // Writes every column of any table into an Excel (tab separated) download
+    private void ExportAnyTableToExcel(DataTable table, string fileNamePrefix)
+    {
+        StringBuilder content = new StringBuilder();
+        int index;
+        for (index = 0; index < table.Columns.Count; index++)
+        {
+            content.Append(SanitizeExcelValue(table.Columns[index].ColumnName));
+            if (index < table.Columns.Count - 1)
+            {
+                content.Append('\t');
+            }
+        }
+        content.AppendLine();
+
+        foreach (DataRow row in table.Rows)
+        {
+            for (index = 0; index < table.Columns.Count; index++)
+            {
+                content.Append(SanitizeExcelValue(GetColumnValue(row, table.Columns[index].ColumnName)));
+                if (index < table.Columns.Count - 1)
+                {
+                    content.Append('\t');
+                }
+            }
+            content.AppendLine();
+        }
+
+        string fileName = fileNamePrefix + "_" + DateTime.Now.ToString("yyyyMMddHHmmss", CultureInfo.InvariantCulture) + ".xls";
+
+        Response.Clear();
+        Response.Buffer = true;
+        Response.Charset = string.Empty;
+        Response.ContentType = "application/vnd.ms-excel";
+        Response.AppendHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
+        Response.Write(content.ToString());
+        _exportingExcel = true;
+        HttpContext.Current.ApplicationInstance.CompleteRequest();
     }
 
     private void BindCourseSchedules()
@@ -282,6 +606,11 @@ ORDER BY Course_Schedule.Schedule_ID DESC", con))
         if (!paymentDetails.Columns.Contains("Exam_Details_Verified"))
         {
             paymentDetails.Columns.Add("Exam_Details_Verified", typeof(bool));
+        }
+
+        if (!paymentDetails.Columns.Contains("Candidates_Selected"))
+        {
+            paymentDetails.Columns.Add("Candidates_Selected", typeof(int));
         }
 
         EnsureDisplayColumn(paymentDetails, "GST_Number", "GST_No");
@@ -487,3 +816,57 @@ ORDER BY Course_Schedule.Schedule_ID DESC", con))
         return Convert.ToString(row[columnName]);
     }
 }
+
+
+
+/*
+=====================================================================
+ STORY OF THIS CODE FILE (explained like you are 10 years old)
+ Last updated: 19 Nov 2026 (FINAL version)
+=====================================================================
+
+ WHAT THIS FILE IS
+ -----------------
+ The .aspx file is the "face" (what you see). This file is the "brain"
+ (what happens when you click).
+
+ WHAT WE HAD ALREADY DONE
+ ------------------------
+ 1. List of successful payments, View receipt, Download Excel of the list.
+ 2. "Verify Exam Details" checkbox + button (red <-> green), saved by
+    UpdateExamDetailsVerification (who + when too).
+ 3. FINANCE = look only (IsFinanceUser + a lock in SetExamVerification);
+    the database also shows finance only Verified payments.
+ 4. The first SQL is running on the live database.
+
+ WHAT WE DID NOW (FINAL)
+ -----------------------
+ 1. DownloadCandidatesExcel(): click on "Number of Candidates" -> asks the
+    database (GetCandidatesByTransaction) for all candidates of that payment
+    and ExportAnyTableToExcel() writes ALL columns to Excel.
+    The database joins NOMINATIONS_FOR_COURSES + Candidate_Registration +
+    Candidate_Registration_Screeners, so different column names in those
+    tables are already handled inside the SQL.
+ 2. OpenCandidatePanel(): the "Verify Candidates" link opens a box with a
+    checkbox per candidate - only after the payment is "Verified".
+ 3. btnCandSave_Click(): collects the ticked candidates (each only once) and
+    sends them to SaveVerifiedCandidates. The database also checks that they
+    really belong to that payment. The "5/10" count on the grid updates.
+ 4. Finance: cannot open the box or save (checked here and in the database).
+    Finance's candidate Excel has ONLY the ticked candidates
+    (LoadCandidates sends @OnlyVerified = 1 for finance).
+ 5. Only the two page files changed - BCASClassLibrary is untouched.
+
+ WHAT IS LEFT TO DO
+ ------------------
+ 1. Backup, then run CourseWisePaymentDetails_FINAL_LiveDB_Script.sql on
+    LIVE before uploading these two page files.
+ 2. Run the checks at the bottom of the SQL file. Check (b) must return no
+    rows. If it does, the invoice <-> nomination link needs a fix.
+ 3. Test: admin, payee/sponsoring, finadmin.
+ 4. Ask Varun sir: should ticked candidates be cleared if a payment goes
+    back to "Not Verified"? (Now they are kept.)
+ 5. Later idea: show names instead of codes (Sex_Code, Designation_Code ...)
+    in the Excel by joining the master tables.
+=====================================================================
+*/
