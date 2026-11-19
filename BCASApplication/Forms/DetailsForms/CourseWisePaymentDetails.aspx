@@ -49,6 +49,15 @@
         }
         .verify-no  { background-color: #CC0000 !important; }
         .verify-yes { background-color: #008000 !important; }
+        .auto-style1 {
+            height: 36px;
+        }
+        .auto-style2 {
+            width: 70%;
+            text-align: left;
+            vertical-align: top;
+            height: 36px;
+        }
     </style>
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" Runat="Server">
@@ -76,8 +85,8 @@
                         </td>
                     </tr>
                     <tr bgcolor="#ffcccc">
-                        <td>&nbsp;</td>
-                        <td class="payment-field">
+                        <td class="auto-style1"></td>
+                        <td class="auto-style2">
                             <asp:Button ID="btnClear" runat="server" CausesValidation="False" ForeColor="#000099" Text="Clear" OnClick="btnClear_Click" />
                             &nbsp;
                             <asp:Button ID="btnExportExcel" runat="server" CausesValidation="False" ForeColor="#000099" Text="Download Excel" OnClick="btnExportExcel_Click" />
