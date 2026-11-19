@@ -17,6 +17,10 @@ public partial class Forms_DetailsForms_CourseWisePaymentDetails : System.Web.UI
     private bool? _isFinanceUser = null;   // remembers the answer so we ask "is this finance?" only once
 
     // True when the logged-in person is FINANCE (they may only LOOK, not verify)
+
+
+    // True when the logged-in person is FINANCE (they may only LOOK, not verify)
+
     protected bool IsFinanceUser
     {
         get
