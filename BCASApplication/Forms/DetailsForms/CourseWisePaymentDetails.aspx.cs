@@ -33,6 +33,30 @@ public partial class Forms_DetailsForms_CourseWisePaymentDetails : System.Web.UI
         }
     }
 
+    // Makes sure the page has a ScriptManager (needed for the in-place refresh).
+    // If the master page already has one, nothing is added.
+    protected void Page_Init(object sender, EventArgs e)
+    {
+        if (ScriptManager.GetCurrent(Page) == null)
+        {
+            Page.Form.Controls.AddAt(0, new ScriptManager());
+        }
+    }
+
+    // The "Number of Candidates" link downloads an Excel file, which cannot happen inside an in-place refresh,
+    // so that link is registered to do a normal postback.
+    protected void grdPaymentDetails_RowCreated(object sender, GridViewRowEventArgs e)
+    {
+        if (e.Row.RowType == DataControlRowType.DataRow)
+        {
+            LinkButton lnk = e.Row.FindControl("lnkCandidates") as LinkButton;
+            if (lnk != null)
+            {
+                ScriptManager.GetCurrent(Page).RegisterPostBackControl(lnk);
+            }
+        }
+    }
+
     protected void Page_Load(object sender, EventArgs e)
     {
         if (Convert.ToString(HttpContext.Current.Session["UserId"]).Trim().Length == 0)
@@ -461,7 +485,7 @@ ORDER BY cand.Candidate_Name, cand.Candidate_ID";
         }
 
         // finance does not get the tick-box column
-        grdCandidates.Columns[0].Visible = !IsFinanceUser;
+        grdCandidates.Columns[1].Visible = !IsFinanceUser;   // column 0 is S.No., column 1 is the tick-box
 
         grdCandidates.DataSource = candidates;
         grdCandidates.DataBind();
