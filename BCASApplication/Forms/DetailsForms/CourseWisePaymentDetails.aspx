@@ -269,6 +269,79 @@
             </ContentTemplate>
         </asp:UpdatePanel>
 
+    <%-- Keeps the page exactly where it was after ANY click (Select Candidates, tick-boxes, Verify, Save ...).
+         It remembers the scroll position (window + any scrolling box + the wide grids) before the click and puts it back afterwards. --%>
+    <script type="text/javascript">
+    (function () {
+        var KEY = 'cwpScrollPos';
+
+        function snapshot() {
+            var s = { x: window.pageXOffset || 0, y: window.pageYOffset || 0, els: [], grids: [] };
+            var all = document.getElementsByTagName('*');
+            for (var i = 0; i < all.length; i++) {
+                var el = all[i];
+                if ((el.scrollTop > 0 || el.scrollLeft > 0) && el.className.toString().indexOf('grid-scroll') < 0) {
+                    s.els.push({ el: el, t: el.scrollTop, l: el.scrollLeft });
+                }
+            }
+            var g = document.querySelectorAll('.grid-scroll');
+            for (var j = 0; j < g.length; j++) {
+                s.grids.push({ t: g[j].scrollTop, l: g[j].scrollLeft });
+            }
+            return s;
+        }
+
+        function restore(s) {
+            if (!s) { return; }
+            function apply() {
+                window.scrollTo(s.x, s.y);
+                for (var i = 0; i < s.els.length; i++) {
+                    s.els[i].el.scrollTop = s.els[i].t;
+                    s.els[i].el.scrollLeft = s.els[i].l;
+                }
+                var g = document.querySelectorAll('.grid-scroll');
+                for (var j = 0; j < s.grids.length && j < g.length; j++) {
+                    g[j].scrollTop = s.grids[j].t;
+                    g[j].scrollLeft = s.grids[j].l;
+                }
+            }
+            apply();
+            setTimeout(apply, 0);
+            setTimeout(apply, 100);
+        }
+
+        // 1) In-place (partial) refresh: save before the click, restore after the update
+        var snap = null;
+        function hookAjax() {
+            if (typeof Sys === 'undefined' || !Sys.WebForms || !Sys.WebForms.PageRequestManager) { return; }
+            var prm = Sys.WebForms.PageRequestManager.getInstance();
+            prm.add_beginRequest(function () { snap = snapshot(); });
+            prm.add_endRequest(function () { restore(snap); });
+        }
+        window.addEventListener('load', hookAjax);
+
+        // 2) Safety net: if a click ever does a full page reload, restore the position after it loads
+        window.addEventListener('beforeunload', function () {
+            try {
+                var s = snapshot();
+                sessionStorage.setItem(KEY, JSON.stringify({ u: location.pathname, ts: new Date().getTime(), x: s.x, y: s.y, grids: s.grids }));
+            } catch (e) { }
+        });
+        window.addEventListener('load', function () {
+            try {
+                var raw = sessionStorage.getItem(KEY);
+                if (!raw) { return; }
+                sessionStorage.removeItem(KEY);
+                var d = JSON.parse(raw);
+                if (d.u === location.pathname && (new Date().getTime() - d.ts) < 10000) {
+                    d.els = [];
+                    restore(d);
+                }
+            } catch (e) { }
+        });
+    })();
+    </script>
+
     </div>
 </asp:Content>
 
